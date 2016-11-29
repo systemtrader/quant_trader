@@ -1,0 +1,15 @@
+<!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
+<node>
+  <interface name="org.ctp.ctp_executer">
+    <method name="setPosition">
+      <arg name="instrument" type="s" direction="in"/>
+      <arg name="position" type="i" direction="in"/>
+    </method>
+    <method name="getPosition">
+      <arg type="i" direction="out"/>
+      <arg name="instrument" type="s" direction="in"/>
+    </method>
+    <method name="quit">
+    </method>
+  </interface>
+</node>
