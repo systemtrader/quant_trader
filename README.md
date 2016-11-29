@@ -1,1 +1,1 @@
-# quant_trader
+量化策略交易系统, 接收从market_watcher发来的Tick, 由量化策略做决策, 发送仓位(虚盘)给执行模块.
