@@ -78,7 +78,6 @@ public:
     }
 
     virtual const T& operator[](int i) const = 0;
-    virtual T& operator[](int i) = 0;
 };
 
 #include <QVector>

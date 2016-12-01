@@ -9,3 +9,8 @@ AbstractIndicator::~AbstractIndicator()
 {
     //
 }
+
+void AbstractIndicator::setBarList(QList<Bar> *list)
+{
+    barlist = list;
+}

@@ -2,6 +2,7 @@
 #define ABSTRACT_STRATEGY_H
 
 #include "bar_collector.h"
+#include "indicator/mql5_indicator.h"
 
 class AbstractIndicator;
 
@@ -12,6 +13,7 @@ class AbstractStrategy : public QObject
 protected:
     BarCollector::TimeFrame time_frame;
     QList<AbstractIndicator*> indicators;
+    QList<Bar> *barlist;
 
     int position;
     double tp_price;
@@ -22,6 +24,9 @@ protected:
 public:
     explicit AbstractStrategy(const QString& instrument, const QString& time_frame_str, QObject *parent = 0);
     ~AbstractStrategy();
+
+    // Should call setBarList after setParameter
+    void setBarList(QList<Bar> *list);
 
     // Inherit from AbstractStrategy and overwite following functions
     virtual void setParameter(const QVariant& param1, const QVariant& param2, const QVariant& param3,

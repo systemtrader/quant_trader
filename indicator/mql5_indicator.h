@@ -73,12 +73,38 @@ public:
     }
 };
 
+template<typename T, typename M>
+class RemapListMember : public _TimeSeries<T> {
+protected:
+    QList<M>* barlist;
+    T M::* pm;
+
+public:
+    RemapListMember(QList<M> *list, T M::* pmt) :
+        _TimeSeries<T>(false),
+        barlist(list),
+        pm(pmt) {
+    }
+
+    ~RemapListMember() {}
+
+    const T& operator[](int i) const {
+        if (this->is_time_series) {
+            return barlist->at(barlist->size() - 1 - i).*pm;
+        } else {
+            return barlist->at(i).*pm;
+        }
+    }
+};
+
+class Bar;
+
 class MQL5Indicator : public AbstractIndicator
 {
     Q_GADGET
 public:
     explicit MQL5Indicator(int indicator_buffers);
-    ~MQL5Indicator() {}
+    ~MQL5Indicator();
 
     const IndicatorBuffer<double>& getBufferByIndex(const int index = 0) const {
         return *(indicator_buffers[index]);
@@ -92,7 +118,17 @@ protected:
     int rates_total;
     int prev_calculated;
     QVector<IndicatorBuffer<double>*> indicator_buffers;
+    bool remaped;   // if true, delete following pointers in deconstructor
+    RemapListMember<uint, Bar> *time;
+    RemapListMember<double, Bar> *open;
+    RemapListMember<double, Bar> *high;
+    RemapListMember<double, Bar> *low;
+    RemapListMember<double, Bar> *close;
+    RemapListMember<long, Bar> *tick_volume;
+    RemapListMember<long, Bar> *volume;
+    RemapListMember<int, Bar> *spread;
 
+    void setBarList(QList<Bar> *list);
     void update();
 
     virtual void OnInit() = 0;
@@ -104,17 +140,18 @@ protected:
         ENUM_INDEXBUFFER_TYPE     data_type = INDICATOR_DATA    // what will be stored
     );
 
-    virtual int OnCalculate (const int rates_total,                     // size of input time series
-                             const int prev_calculated,                 // bars handled in previous call
-                             const Mql5DynamicArray<int>& time,         // Time
-                             const Mql5DynamicArray<double>& open,      // Open
-                             const Mql5DynamicArray<double>& high,      // High
-                             const Mql5DynamicArray<double>& low,       // Low
-                             const Mql5DynamicArray<double>& close,     // Close
-                             const Mql5DynamicArray<long>& tick_volume, // Tick Volume
-                             const Mql5DynamicArray<long>& volume,      // Real Volume
-                             const Mql5DynamicArray<int>& spread        // Spread
-                             ) = 0;
+    virtual
+    int OnCalculate (const int rates_total,                     // size of input time series
+                     const int prev_calculated,                 // bars handled in previous call
+                     const _TimeSeries<uint>& time,             // Time
+                     const _TimeSeries<double>& open,           // Open
+                     const _TimeSeries<double>& high,           // High
+                     const _TimeSeries<double>& low,            // Low
+                     const _TimeSeries<double>& close,          // Close
+                     const _TimeSeries<long>& tick_volume,      // Tick Volume
+                     const _TimeSeries<long>& volume,           // Real Volume
+                     const _TimeSeries<int>& spread             // Spread
+                     ) = 0;
 };
 
 typedef double (* SIMPLIFY_PRICE)(double, double, double, double);
@@ -144,21 +181,22 @@ protected:
     void preCalculate();
     int OnCalculate (const int rates_total,                     // size of input time series
                      const int prev_calculated,                 // bars handled in previous call
-                     const Mql5DynamicArray<int>& time,         // Time
-                     const Mql5DynamicArray<double>& open,      // Open
-                     const Mql5DynamicArray<double>& high,      // High
-                     const Mql5DynamicArray<double>& low,       // Low
-                     const Mql5DynamicArray<double>& close,     // Close
-                     const Mql5DynamicArray<long>& tick_volume, // Tick Volume
-                     const Mql5DynamicArray<long>& volume,      // Real Volume
-                     const Mql5DynamicArray<int>& spread        // Spread
+                     const _TimeSeries<uint>& time,             // Time
+                     const _TimeSeries<double>& open,           // Open
+                     const _TimeSeries<double>& high,           // High
+                     const _TimeSeries<double>& low,            // Low
+                     const _TimeSeries<double>& close,          // Close
+                     const _TimeSeries<long>& tick_volume,      // Tick Volume
+                     const _TimeSeries<long>& volume,           // Real Volume
+                     const _TimeSeries<int>& spread             // Spread
                      );
 
-    virtual int OnCalculate (const int rates_total,                     // size of the price[] array
-                             const int prev_calculated,                 // bars handled on a previous call
-                             const int begin,                           // where the significant data start from
-                             const _TimeSeries<double>& price           // array to calculate
-                             ) = 0;
+    virtual
+    int OnCalculate (const int rates_total,                     // size of the price[] array
+                     const int prev_calculated,                 // bars handled on a previous call
+                     const int begin,                           // where the significant data start from
+                     const _TimeSeries<double>& price           // array to calculate
+                     ) = 0;
 };
 
 #endif // MQL5_INDICATOR_H

@@ -1,4 +1,5 @@
 #include "mql5_indicator.h"
+#include "bar.h"
 
 static double price_open(double open, double high, double low, double close)
 {
@@ -40,25 +41,46 @@ MQL5Indicator::MQL5Indicator(int indicator_buffers) :
     prev_calculated(0),
     indicator_buffers(indicator_buffers)
 {
-    //
+    remaped = false;
+}
+
+MQL5Indicator::~MQL5Indicator()
+{
+    if (remaped) {
+        delete time;
+        delete open;
+        delete high;
+        delete low;
+        delete close;
+    }
+}
+
+void MQL5Indicator::setBarList(QList<Bar> *list)
+{
+    AbstractIndicator::setBarList(list);
+    time = new RemapListMember<uint, Bar>(list, &Bar::time);
+    open = new RemapListMember<double, Bar>(list, &Bar::open);
+    high = new RemapListMember<double, Bar>(list, &Bar::high);
+    low = new RemapListMember<double, Bar>(list, &Bar::low);
+    close = new RemapListMember<double, Bar>(list, &Bar::close);
+    // tick_volume, volume and spread are not implemented yet, don't use them in indicators
+    remaped = true;
 }
 
 void MQL5Indicator::update()
 {
     preCalculate();
-/*
-    m_prev_calculated = OnCalculate(m_rates_total,
-                                    m_prev_calculated,
-                                    time,
-                                    open,
-                                    high,
-                                    low,
-                                    close,
-                                    tick_volume,
-                                    volume,
-                                    spead);
-*/
-    // TODO
+    prev_calculated = OnCalculate(rates_total,
+                                  prev_calculated,
+                                  *time,
+                                  *open,
+                                  *high,
+                                  *low,
+                                  *close,
+                                  *tick_volume,
+                                  *volume,
+                                  *spread
+                                  );
 }
 
 void MQL5Indicator::SetIndexBuffer(int index, IndicatorBuffer<double> & buffer, ENUM_INDEXBUFFER_TYPE)
@@ -114,14 +136,14 @@ void MQL5IndicatorOnSingleDataBuffer::preCalculate()
 
 int MQL5IndicatorOnSingleDataBuffer::OnCalculate(const int rates_total,                     // size of input time series
                                                  const int prev_calculated,                 // bars handled in previous call
-                                                 const Mql5DynamicArray<int>& time,         // Time
-                                                 const Mql5DynamicArray<double>& open,      // Open
-                                                 const Mql5DynamicArray<double>& high,      // High
-                                                 const Mql5DynamicArray<double>& low,       // Low
-                                                 const Mql5DynamicArray<double>& close,     // Close
-                                                 const Mql5DynamicArray<long>& tick_volume, // Tick Volume
-                                                 const Mql5DynamicArray<long>& volume,      // Real Volume
-                                                 const Mql5DynamicArray<int>& spread        // Spread
+                                                 const _TimeSeries<uint>& time,             // Time
+                                                 const _TimeSeries<double>& open,           // Open
+                                                 const _TimeSeries<double>& high,           // High
+                                                 const _TimeSeries<double>& low,            // Low
+                                                 const _TimeSeries<double>& close,          // Close
+                                                 const _TimeSeries<long>& tick_volume,      // Tick Volume
+                                                 const _TimeSeries<long>& volume,           // Real Volume
+                                                 const _TimeSeries<int>& spread             // Spread
                                                  )
 {
     int limit;
