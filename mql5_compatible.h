@@ -83,6 +83,24 @@ public:
 #include <QVector>
 
 template<typename T>
+class _ListProxy : public _TimeSeries<T> {
+protected:
+    QList<T> * const data;
+public:
+    _ListProxy(QList<T> *list) :
+        _TimeSeries<T>(true),   // time series as default
+        data(list) {
+    }
+    const T& operator[](int i) const {
+        if (this->is_time_series) {
+            return data->at(data->size() - 1 - i);
+        } else {
+            return data->at(i);
+        }
+    }
+};
+
+template<typename T>
 class _VectorProxy : public _TimeSeries<T> {
 protected:
     QVector<T> * const data;

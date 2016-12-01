@@ -2,7 +2,6 @@
 #define ABSTRACT_STRATEGY_H
 
 #include "bar_collector.h"
-#include "indicator/mql5_indicator.h"
 
 class AbstractIndicator;
 

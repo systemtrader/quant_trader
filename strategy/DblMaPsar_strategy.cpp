@@ -57,15 +57,17 @@ void DblMaPsarStrategy::onNewBar()
     ArraySetAsSeries(slow_ma_buf, true);
     ArraySetAsSeries(psar_buf, true);
 
+    _ListProxy<Bar> bars(barlist);
+
     if (fast_ma_buf[1] > slow_ma_buf[1] && fast_ma_buf[2] <= slow_ma_buf[2]) {
-//        if (psar_buf[1] < bars[1].m_low_price) {
+        if (psar_buf[1] < bars[1].low) {
             position = 1;
-//        }
+        }
     }
 
     if (fast_ma_buf[1] < slow_ma_buf[1] && fast_ma_buf[2] >= slow_ma_buf[2]) {
-//        if (psar_buf[1] > bars[1].m_high_price) {
+        if (psar_buf[1] > bars[1].high) {
             position = -1;
-//        }
+        }
     }
 }
