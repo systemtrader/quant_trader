@@ -20,7 +20,7 @@ protected:
     bool isNewBar();
 
 public:
-    explicit AbstractStrategy(const QString& instrument, const QString& time_frame, QObject *parent = 0);
+    explicit AbstractStrategy(const QString& instrument, const QString& time_frame_str, QObject *parent = 0);
     ~AbstractStrategy();
 
     // Inherit from AbstractStrategy and overwite following functions

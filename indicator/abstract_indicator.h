@@ -8,7 +8,7 @@ class AbstractIndicator
     Q_GADGET
 public:
     explicit AbstractIndicator();
-    ~AbstractIndicator();
+    virtual ~AbstractIndicator();
 
     virtual void update() = 0;
 };

@@ -14,7 +14,7 @@ MA::MA(int period, int shift, ENUM_MA_METHOD ma_method, ENUM_APPLIED_PRICE appli
 //+------------------------------------------------------------------+
 //|   simple moving average                                          |
 //+------------------------------------------------------------------+
-void MA::CalculateSimpleMA(int rates_total,int prev_calculated,int begin,const Mql5DynamicArray<double> &price)
+void MA::CalculateSimpleMA(int rates_total,int prev_calculated,int begin,const _TimeSeries<double> &price)
   {
    int i,limit;
 //--- first calculation or number of bars was changed
@@ -39,7 +39,7 @@ void MA::CalculateSimpleMA(int rates_total,int prev_calculated,int begin,const M
 //+------------------------------------------------------------------+
 //|  exponential moving average                                      |
 //+------------------------------------------------------------------+
-void MA::CalculateEMA(int rates_total,int prev_calculated,int begin,const Mql5DynamicArray<double> &price)
+void MA::CalculateEMA(int rates_total,int prev_calculated,int begin,const _TimeSeries<double> &price)
   {
    int    i,limit;
    double SmoothFactor=2.0/(1.0+InpMAPeriod);
@@ -60,7 +60,7 @@ void MA::CalculateEMA(int rates_total,int prev_calculated,int begin,const Mql5Dy
 //+------------------------------------------------------------------+
 //|  linear weighted moving average                                  |
 //+------------------------------------------------------------------+
-void MA::CalculateLWMA(int rates_total,int prev_calculated,int begin,const Mql5DynamicArray<double> &price)
+void MA::CalculateLWMA(int rates_total,int prev_calculated,int begin,const _TimeSeries<double> &price)
   {
    int        i,limit;
    static int weightsum;
@@ -96,7 +96,7 @@ void MA::CalculateLWMA(int rates_total,int prev_calculated,int begin,const Mql5D
 //+------------------------------------------------------------------+
 //|  smoothed moving average                                         |
 //+------------------------------------------------------------------+
-void MA::CalculateSmoothedMA(int rates_total,int prev_calculated,int begin,const Mql5DynamicArray<double> &price)
+void MA::CalculateSmoothedMA(int rates_total,int prev_calculated,int begin,const _TimeSeries<double> &price)
   {
    int i,limit;
 //--- first calculation or number of bars was changed
@@ -151,7 +151,7 @@ void MA::OnInit()
 int MA::OnCalculate (const int rates_total,                     // size of the price[] array
                      const int prev_calculated,                 // bars handled on a previous call
                      const int begin,                           // where the significant data start from
-                     const Mql5DynamicArray<double>& price      // array to calculate
+                     const _TimeSeries<double>& price      // array to calculate
                      )
   {
 //--- check for bars count

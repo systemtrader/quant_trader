@@ -53,24 +53,45 @@ inline bool PlotIndexSetInteger(...) { return true; }
 inline bool PlotIndexSetString (...) { return true; }
 inline int  PlotIndexGetInteger(...) { return 0; }
 
+template<typename T>
+class IndicatorBuffer : public _VectorProxy<T> {
+public:
+    IndicatorBuffer() :
+        _VectorProxy<T>() {
+        data->reserve(8192);  // TODO need 16K or more?
+    }
+
+    IndicatorBuffer(const _VectorProxy<T>& other) :
+        _VectorProxy<T>(other) {
+    }
+
+    ~IndicatorBuffer() {
+    }
+
+    void resize(int new_size) {
+        data->resize(new_size);
+    }
+};
+
 class MQL5Indicator : public AbstractIndicator
 {
     Q_GADGET
 public:
     explicit MQL5Indicator(int indicator_buffers);
+    ~MQL5Indicator() {}
 
-    const Mql5DynamicArray<double>& getBufferByIndex(const int index = 0) const {
+    const IndicatorBuffer<double>& getBufferByIndex(const int index = 0) const {
         return *(indicator_buffers[index]);
     }
 
-    const Mql5DynamicArray<double>& operator[](const int index) const {
+    const IndicatorBuffer<double>& operator[](const int index) const {
         return *(indicator_buffers[index]);
     }
 
 protected:
     int rates_total;
     int prev_calculated;
-    QVector<Mql5DynamicArray<double>*> indicator_buffers;
+    QVector<IndicatorBuffer<double>*> indicator_buffers;
 
     void update();
 
@@ -79,7 +100,7 @@ protected:
 
     void SetIndexBuffer(
         int                       index,                        // buffer index
-        Mql5DynamicArray<double> & buffer,                       // array
+        IndicatorBuffer<double> & buffer,                       // array
         ENUM_INDEXBUFFER_TYPE     data_type = INDICATOR_DATA    // what will be stored
     );
 
@@ -113,11 +134,12 @@ public:
     };
 
     explicit MQL5IndicatorOnSingleDataBuffer(int indicator_buffers, ENUM_APPLIED_PRICE applied_price);
+    ~MQL5IndicatorOnSingleDataBuffer() {}
 
 protected:
     const ENUM_APPLIED_PRICE applied_price;
     SIMPLIFY_PRICE simplify_func;
-    Mql5DynamicArray<double> applied_price_buffer;
+    IndicatorBuffer<double> applied_price_buffer;
 
     void preCalculate();
     int OnCalculate (const int rates_total,                     // size of input time series
@@ -135,7 +157,7 @@ protected:
     virtual int OnCalculate (const int rates_total,                     // size of the price[] array
                              const int prev_calculated,                 // bars handled on a previous call
                              const int begin,                           // where the significant data start from
-                             const Mql5DynamicArray<double>& price      // array to calculate
+                             const _TimeSeries<double>& price           // array to calculate
                              ) = 0;
 };
 

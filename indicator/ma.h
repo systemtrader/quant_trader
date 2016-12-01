@@ -19,24 +19,25 @@ public:
     };
 
     explicit MA(int period, int shift, ENUM_MA_METHOD ma_method, MQL5IndicatorOnSingleDataBuffer::ENUM_APPLIED_PRICE applied_price = PRICE_CLOSE, QObject *parent = 0);
+    ~MA() {}
 
 protected:
     int            InpMAPeriod;     // Period
     int            InpMAShift;      // Shift
     ENUM_MA_METHOD InpMAMethod;     // Method
 
-    Mql5DynamicArray<double> ExtLineBuffer;
+    IndicatorBuffer<double> ExtLineBuffer;
 
-    void CalculateSimpleMA(int rates_total,int prev_calculated,int begin,const Mql5DynamicArray<double> &price);
-    void CalculateEMA(int rates_total,int prev_calculated,int begin,const Mql5DynamicArray<double> &price);
-    void CalculateLWMA(int rates_total,int prev_calculated,int begin,const Mql5DynamicArray<double> &price);
-    void CalculateSmoothedMA(int rates_total,int prev_calculated,int begin,const Mql5DynamicArray<double> &price);
+    void CalculateSimpleMA(int rates_total,int prev_calculated,int begin,const _TimeSeries<double> &price);
+    void CalculateEMA(int rates_total,int prev_calculated,int begin,const _TimeSeries<double> &price);
+    void CalculateLWMA(int rates_total,int prev_calculated,int begin,const _TimeSeries<double> &price);
+    void CalculateSmoothedMA(int rates_total,int prev_calculated,int begin,const _TimeSeries<double> &price);
 
     void OnInit();
     int OnCalculate (const int rates_total,                     // size of the price[] array
                      const int prev_calculated,                 // bars handled on a previous call
                      const int begin,                           // where the significant data start from
-                     const Mql5DynamicArray<double>& price      // array to calculate
+                     const _TimeSeries<double>& price           // array to calculate
                      );
 
 signals:

@@ -12,14 +12,15 @@ class ParabolicSAR : public QObject, public MQL5Indicator
 
 public:
     explicit ParabolicSAR(double step = 0.02, double maximum = 0.2, QObject *parent = 0);
+    ~ParabolicSAR() {}
 
 protected:
     double InpSARStep;
     double InpSARMaximum;
 
-    Mql5DynamicArray<double> ExtSARBuffer;
-    Mql5DynamicArray<double> ExtEPBuffer;
-    Mql5DynamicArray<double> ExtAFBuffer;
+    IndicatorBuffer<double> ExtSARBuffer;
+    IndicatorBuffer<double> ExtEPBuffer;
+    IndicatorBuffer<double> ExtAFBuffer;
 
     int    ExtLastRevPos;
     bool   ExtDirectionLong;

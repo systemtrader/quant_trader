@@ -79,44 +79,30 @@ public:
 
     virtual const T& operator[](int i) const = 0;
     virtual T& operator[](int i) = 0;
-    virtual void initialize(const T& value) = 0;
-    virtual int resize(int new_size, int reserve_size = 0) = 0;
 };
 
 #include <QVector>
 
 template<typename T>
-class Mql5DynamicArray : public _TimeSeries<T> {
+class _VectorProxy : public _TimeSeries<T> {
+protected:
     QVector<T> * const data;
     const bool is_data_owner;
 
 public:
-    Mql5DynamicArray() :
+    _VectorProxy() :
         _TimeSeries<T>(false),
         data(new QVector<T>()),
         is_data_owner(true) {
-        data->reserve(8192);  // TODO need adjust?
     }
 
-    Mql5DynamicArray(int size) :
-        _TimeSeries<T>(false),
-        data(new QVector<T>(size)),   // unnecessary?
-        is_data_owner(true) {
-    }
-
-    Mql5DynamicArray(const Mql5DynamicArray& other) :
+    _VectorProxy(const _VectorProxy<T>& other) :
         _TimeSeries<T>(other.is_time_series),
         data(other.data),
         is_data_owner(false) {
     }
 
-    Mql5DynamicArray(QVector<T> *data) :
-        _TimeSeries<T>(false),
-        data(data),
-        is_data_owner(false) {
-    }
-
-    ~Mql5DynamicArray() {
+    ~_VectorProxy() {
         if (is_data_owner) {
             delete data;
         }
@@ -145,9 +131,23 @@ public:
     void initialize(const T& value) {
         data->fill(value);
     }
+};
 
-    // TODO need UT, compare result with MT5
-    int resize(int new_size, int reserve_size = 0) {
+template<typename T>
+class Mql5DynamicArray : public _VectorProxy<T> {
+public:
+    Mql5DynamicArray() :
+        _VectorProxy<T>() {
+    }
+
+    Mql5DynamicArray(const _VectorProxy<T>& other) :
+        _VectorProxy<T>(other) {
+    }
+
+    ~Mql5DynamicArray() {
+    }
+
+    int resize(int new_size, int reserve_size) {
         if (new_size > data->capacity() && reserve_size > 0) {
             data->reserve(new_size + reserve_size);
         }
@@ -158,16 +158,16 @@ public:
 
 template<typename T>
 inline bool ArrayGetAsSeries(
-   const _TimeSeries<T>&  array    // array for checking
+   _TimeSeries<T>&         array            // array for checking
 )
 {
     return array.getAsSeries();
 }
 
 template<typename T>
-inline bool  ArraySetAsSeries(
-   const _TimeSeries<T>&  array,    // array by reference
-   bool                        flag      // true denotes reverse order of indexing
+inline bool ArraySetAsSeries(
+   _TimeSeries<T>&         array,           // array by reference
+   bool                    flag             // true denotes reverse order of indexing
 )
 {
     array.setAsSeries(flag);
@@ -176,18 +176,19 @@ inline bool  ArraySetAsSeries(
 
 template<typename T, typename V>
 inline void ArrayInitialize(
-   _TimeSeries<T>&    array,   // initialized array
-   const V&                value    // value that will be set
+   _VectorProxy<T>&        array,           // initialized array
+   const V&                value            // value that will be set
 )
 {
     array.initialize(static_cast<T>(value));
 }
 
+// TODO need UT, should compare result with MT5
 template<typename T>
 inline int ArrayResize(
-   _TimeSeries<T>&    array,              // array passed by reference
-   int                     new_size,           // new array size
-   int                     reserve_size=0      // reserve size value (excess)
+   Mql5DynamicArray<T>&    array,           // array passed by reference
+   int                     new_size,        // new array size
+   int                     reserve_size=0   // reserve size value (excess)
 )
 {
     return array.resize(new_size, reserve_size);

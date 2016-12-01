@@ -61,7 +61,7 @@ void MQL5Indicator::update()
     // TODO
 }
 
-void MQL5Indicator::SetIndexBuffer(int index, Mql5DynamicArray<double> & buffer, ENUM_INDEXBUFFER_TYPE)
+void MQL5Indicator::SetIndexBuffer(int index, IndicatorBuffer<double> & buffer, ENUM_INDEXBUFFER_TYPE)
 {
     indicator_buffers[index] = &buffer;
 }
@@ -69,7 +69,7 @@ void MQL5Indicator::SetIndexBuffer(int index, Mql5DynamicArray<double> & buffer,
 void MQL5Indicator::preCalculate()
 {
     // TODO calculate m_rates_total
-    foreach (Mql5DynamicArray<double> *buffer, indicator_buffers) {
+    foreach (IndicatorBuffer<double> *buffer, indicator_buffers) {
         buffer->resize(rates_total);
     }
 }

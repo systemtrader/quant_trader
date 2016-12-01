@@ -14,7 +14,7 @@ DblMaPsarStrategy::DblMaPsarStrategy(const QString& instrument, const QString& t
 
 void DblMaPsarStrategy::setParameter(const QVariant& param1, const QVariant& param2, const QVariant& param3,
                                      const QVariant& param4, const QVariant& param5, const QVariant& param6,
-                                     const QVariant& param7, const QVariant& param8, const QVariant& param9)
+                                     const QVariant& /*7*/ , const QVariant& /*8*/ , const QVariant& /*9*/)
 {
     int fastPeriod = param1.toInt();
     int slowPeriod = param2.toInt();
@@ -49,22 +49,23 @@ void DblMaPsarStrategy::setParameter(int fastPeriod, int slowPeriod, MA::ENUM_MA
 
 void DblMaPsarStrategy::onNewBar()
 {
-    Mql5DynamicArray<double> fast_ma_buf = fast_ma->getBufferByIndex(0);
-    Mql5DynamicArray<double> slow_ma_buf = slow_ma->getBufferByIndex(0);
-    Mql5DynamicArray<double> psar_buf    = psar->getBufferByIndex(0);
+    IndicatorBuffer<double> fast_ma_buf = fast_ma->getBufferByIndex(0);
+    IndicatorBuffer<double> slow_ma_buf = slow_ma->getBufferByIndex(0);
+    IndicatorBuffer<double> psar_buf    = psar->getBufferByIndex(0);
 
-    fast_ma_buf.setAsSeries(true);
-    slow_ma_buf.setAsSeries(true);
+    ArraySetAsSeries(fast_ma_buf, true);
+    ArraySetAsSeries(slow_ma_buf, true);
+    ArraySetAsSeries(psar_buf, true);
 
     if (fast_ma_buf[1] > slow_ma_buf[1] && fast_ma_buf[2] <= slow_ma_buf[2]) {
-        if (psar_buf[1] < bars[1].m_low_price) {
+//        if (psar_buf[1] < bars[1].m_low_price) {
             position = 1;
-        }
+//        }
     }
 
     if (fast_ma_buf[1] < slow_ma_buf[1] && fast_ma_buf[2] >= slow_ma_buf[2]) {
-        if (psar_buf[1] > bars[1].m_high_price) {
+//        if (psar_buf[1] > bars[1].m_high_price) {
             position = -1;
-        }
+//        }
     }
 }
