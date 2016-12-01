@@ -34,3 +34,5 @@ HEADERS += \
     strategy/abstract_strategy.h
 
 win32:INCLUDEPATH += "$$_PRO_FILE_PWD_"
+
+unix:QMAKE_CXXFLAGS += -std=c++11

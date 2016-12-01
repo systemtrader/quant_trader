@@ -147,10 +147,10 @@ public:
     }
 
     int resize(int new_size, int reserve_size) {
-        if (new_size > data->capacity() && reserve_size > 0) {
-            data->reserve(new_size + reserve_size);
+        if (new_size > this->data->capacity() && reserve_size > 0) {
+            this->data->reserve(new_size + reserve_size);
         }
-        data->resize(new_size);
+        this->data->resize(new_size);
         return new_size;
     }
 };

@@ -58,7 +58,7 @@ class IndicatorBuffer : public _VectorProxy<T> {
 public:
     IndicatorBuffer() :
         _VectorProxy<T>() {
-        data->reserve(8192);  // TODO need 16K or more?
+        this->data->reserve(8192);  // TODO need 16K or more?
     }
 
     IndicatorBuffer(const _VectorProxy<T>& other) :
@@ -69,7 +69,7 @@ public:
     }
 
     void resize(int new_size) {
-        data->resize(new_size);
+        this->data->resize(new_size);
     }
 };
 
