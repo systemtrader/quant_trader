@@ -5,12 +5,12 @@
 
 static QDataStream& operator<<(QDataStream& s, const Bar& bar)
 {
-    // s << bar.m_date;
     s << bar.time;
     s << bar.open;
     s << bar.high;
     s << bar.low;
     s << bar.close;
+    s << bar.volume;
     return s;
 }
 
@@ -45,7 +45,7 @@ void BarCollector::onNewTick(int volume, double turnover, double openInterest, i
 
     if (new_bar_open) {
         current_bar.open = lastPrice;
-        // m_current_bar.m_date = actionDay;
+        // TODO convert time value to time_t format
         current_bar.time = time & 0xffff00;
         new_bar_open = false;
     }

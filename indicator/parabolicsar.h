@@ -27,7 +27,7 @@ protected:
     double ExtSarStep;
     double ExtSarMaximum;
 
-    void OnInit();
+    void OnInit() override;
     int OnCalculate (const int rates_total,                     // size of input time series
                      const int prev_calculated,                 // bars handled in previous call
                      const _TimeSeries<uint>& time,             // Time
@@ -38,7 +38,7 @@ protected:
                      const _TimeSeries<long>& tick_volume,      // Tick Volume
                      const _TimeSeries<long>& volume,           // Real Volume
                      const _TimeSeries<int>& spread             // Spread
-                     );
+                     ) override;
     double GetHigh(int nPosition,int nStartPeriod,const _TimeSeries<double> &HiData);
     double GetLow(int nPosition,int nStartPeriod,const _TimeSeries<double> &LoData);
 

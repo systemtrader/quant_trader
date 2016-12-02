@@ -73,7 +73,7 @@ public:
     }
 };
 
-template<typename T, typename M>
+template<typename M, typename T>
 class RemapListMember : public _TimeSeries<T> {
 protected:
     QList<M>* barlist;
@@ -119,17 +119,17 @@ protected:
     int prev_calculated;
     QVector<IndicatorBuffer<double>*> indicator_buffers;
     bool remaped;   // if true, delete following pointers in deconstructor
-    RemapListMember<uint, Bar> *time;
-    RemapListMember<double, Bar> *open;
-    RemapListMember<double, Bar> *high;
-    RemapListMember<double, Bar> *low;
-    RemapListMember<double, Bar> *close;
-    RemapListMember<long, Bar> *tick_volume;
-    RemapListMember<long, Bar> *volume;
-    RemapListMember<int, Bar> *spread;
+    _TimeSeries<uint> *time;
+    _TimeSeries<double> *open;
+    _TimeSeries<double> *high;
+    _TimeSeries<double> *low;
+    _TimeSeries<double> *close;
+    _TimeSeries<long> *tick_volume;
+    _TimeSeries<long> *volume;
+    _TimeSeries<int> *spread;
 
-    void setBarList(QList<Bar> *list);
-    void update();
+    void setBarList(QList<Bar> *list) override;
+    void update() override;
 
     virtual void OnInit() = 0;
     virtual void preCalculate();
@@ -178,7 +178,7 @@ protected:
     SIMPLIFY_PRICE simplify_func;
     IndicatorBuffer<double> applied_price_buffer;
 
-    void preCalculate();
+    void preCalculate() override;
     int OnCalculate (const int rates_total,                     // size of input time series
                      const int prev_calculated,                 // bars handled in previous call
                      const _TimeSeries<uint>& time,             // Time
@@ -189,7 +189,7 @@ protected:
                      const _TimeSeries<long>& tick_volume,      // Tick Volume
                      const _TimeSeries<long>& volume,           // Real Volume
                      const _TimeSeries<int>& spread             // Spread
-                     );
+                     ) override;
 
     virtual
     int OnCalculate (const int rates_total,                     // size of the price[] array

@@ -8,7 +8,7 @@
 
 class BarCollector;
 class AbstractStrategy;
-class BarSeries;
+class Bar;
 
 class QuantTrader : public QObject
 {
@@ -19,7 +19,7 @@ protected:
 
     // Following QString keys stands for instument names
     QMap<QString, BarCollector*> collector_map;
-    QMap<QString, QMap<int, BarSeries*> > history_barseries;
+    QMap<QString, QMap<int, QList<Bar>*>> bars_map;
     // QMultiMap<QString, AbstractIndicator*> indicator_map;  // managed by strategy
     QMultiMap<QString, AbstractStrategy*> strategy_map;
 

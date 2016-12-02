@@ -33,12 +33,12 @@ protected:
     void CalculateLWMA(int rates_total,int prev_calculated,int begin,const _TimeSeries<double> &price);
     void CalculateSmoothedMA(int rates_total,int prev_calculated,int begin,const _TimeSeries<double> &price);
 
-    void OnInit();
+    void OnInit() override;
     int OnCalculate (const int rates_total,                     // size of the price[] array
                      const int prev_calculated,                 // bars handled on a previous call
                      const int begin,                           // where the significant data start from
                      const _TimeSeries<double>& price           // array to calculate
-                     );
+                     ) override;
 
 signals:
 

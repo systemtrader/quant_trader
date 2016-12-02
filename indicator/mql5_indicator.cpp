@@ -58,12 +58,17 @@ MQL5Indicator::~MQL5Indicator()
 void MQL5Indicator::setBarList(QList<Bar> *list)
 {
     AbstractIndicator::setBarList(list);
-    time = new RemapListMember<uint, Bar>(list, &Bar::time);
-    open = new RemapListMember<double, Bar>(list, &Bar::open);
-    high = new RemapListMember<double, Bar>(list, &Bar::high);
-    low = new RemapListMember<double, Bar>(list, &Bar::low);
-    close = new RemapListMember<double, Bar>(list, &Bar::close);
+    time = new RemapListMember<Bar, uint>(list, &Bar::time);
+    open = new RemapListMember<Bar, double>(list, &Bar::open);
+    high = new RemapListMember<Bar, double>(list, &Bar::high);
+    low = new RemapListMember<Bar, double>(list, &Bar::low);
+    close = new RemapListMember<Bar, double>(list, &Bar::close);
+
     // tick_volume, volume and spread are not implemented yet, don't use them in indicators
+    tick_volume = nullptr;
+    volume = nullptr;
+    spread = nullptr;
+
     remaped = true;
 }
 
