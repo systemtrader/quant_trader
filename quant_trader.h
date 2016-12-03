@@ -6,9 +6,10 @@
 #include "market_watcher_interface.h"
 #include "ctp_executer_interface.h"
 
-class BarCollector;
-class AbstractStrategy;
 class Bar;
+class BarCollector;
+class AbstractIndicator;
+class AbstractStrategy;
 
 class QuantTrader : public QObject
 {
@@ -20,8 +21,9 @@ protected:
     // Following QString keys stands for instument names
     QMap<QString, BarCollector*> collector_map;
     QMap<QString, QMap<int, QList<Bar>*>> bars_map;
-    // QMultiMap<QString, AbstractIndicator*> indicator_map;  // managed by strategy
+    QMultiMap<QString, AbstractIndicator*> indicator_map;
     QMultiMap<QString, AbstractStrategy*> strategy_map;
+    QMap<QString, int> position_map;
 
     void loadQuantTraderSettings();
     void loadTradeStrategySettings();

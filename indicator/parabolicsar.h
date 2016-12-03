@@ -9,14 +9,19 @@ class ParabolicSAR : public QObject, public MQL5Indicator
 {
     Q_OBJECT
     Q_CLASSINFO("indicator_buffers", "3")
+    Q_PROPERTY(double SARStep READ getSARStep)
+    Q_PROPERTY(double SARMaximum READ getSARMaximum)
 
 public:
     explicit ParabolicSAR(double step = 0.02, double maximum = 0.2, QObject *parent = 0);
     ~ParabolicSAR() {}
 
+    double getSARStep() const { return InpSARStep; }
+    double getSARMaximum() const { return InpSARMaximum; }
+
 protected:
-    double InpSARStep;
-    double InpSARMaximum;
+    const double InpSARStep;
+    const double InpSARMaximum;
 
     IndicatorBuffer<double> ExtSARBuffer;
     IndicatorBuffer<double> ExtEPBuffer;
