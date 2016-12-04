@@ -7,6 +7,9 @@
 #include <QString>
 #include <QVariant>
 
+#define EMPTY_VALUE     DBL_MAX
+#define INVALID_HANDLE  -1
+
 typedef QString string;
 #define DoubleToString(x, y) QString::number(x, 'f', y)
 

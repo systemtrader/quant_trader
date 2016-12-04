@@ -94,8 +94,8 @@ QuantTrader::~QuantTrader()
 
 void QuantTrader::onNewTick(int volume, double turnover, double openInterest, int time, double lastPrice, const QString &instrumentID)
 {
-    BarCollector *collector = collector_map.value(instrumentID);
-    if (collector != NULL) {
+    BarCollector *collector = collector_map.value(instrumentID, nullptr);
+    if (collector != nullptr) {
         collector->onNewTick(volume, turnover, openInterest, time, lastPrice);
     }
 

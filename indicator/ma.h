@@ -8,7 +8,7 @@
 class MA : public QObject, public MQL5IndicatorOnSingleDataBuffer
 {
     Q_OBJECT
-    Q_CLASSINFO("indicator_buffers", "1")
+    Q_CLASSINFO("parameter_number", "4")
     Q_PROPERTY(int MAPeroid READ getMAPeroid CONSTANT)
     Q_PROPERTY(int MAShift READ getMAShift CONSTANT)
     Q_PROPERTY(ENUM_MA_METHOD MAMethod READ getMAMethod CONSTANT)
@@ -21,7 +21,7 @@ public:
         MODE_LWMA,  // Linear-weighted averaging
     };
 
-    explicit MA(int period, int shift, ENUM_MA_METHOD ma_method, MQL5IndicatorOnSingleDataBuffer::ENUM_APPLIED_PRICE applied_price = PRICE_CLOSE, QObject *parent = 0);
+    Q_INVOKABLE explicit MA(int period, int shift, ENUM_MA_METHOD ma_method, MQL5IndicatorOnSingleDataBuffer::ENUM_APPLIED_PRICE applied_price = PRICE_CLOSE, QObject *parent = 0);
     ~MA() {}
 
     int getMAPeroid() const { return InpMAPeriod; }
