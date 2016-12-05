@@ -3,16 +3,14 @@
 #include "abstract_strategy.h"
 #include "indicator/abstract_indicator.h"
 
-static const int barCollector_enumIdx = BarCollector::staticMetaObject.indexOfEnumerator("TimeFrame");
-
-AbstractStrategy::AbstractStrategy(const QString& instrument, const QString& time_frame_str, QObject *parent) :
+AbstractStrategy::AbstractStrategy(const QString& instr, const QString& time_frame, QObject *parent) :
     QObject(parent),
+    instrument(instr),
+    time_frame_str(time_frame),
     position(0),
     tp_price(-1.0),
     sl_price(-1.0)
 {
-    int time_frame_value = BarCollector::staticMetaObject.enumerator(barCollector_enumIdx).keyToValue(time_frame_str.trimmed().toLatin1().data());
-    this->time_frame = static_cast<BarCollector::TimeFrame>(time_frame_value);
 }
 
 AbstractStrategy::~AbstractStrategy()

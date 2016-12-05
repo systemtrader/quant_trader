@@ -30,7 +30,6 @@ HEADERS += \
     indicator/parabolicsar.h \
     mql5_compatible.h \
     indicator/mql5_indicator.h \
-    bar_series.h \
     strategy/abstract_strategy.h
 
 win32:INCLUDEPATH += "$$_PRO_FILE_PWD_"
