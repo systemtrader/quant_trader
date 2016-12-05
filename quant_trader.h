@@ -27,10 +27,14 @@ protected:
 
     void loadQuantTraderSettings();
     void loadTradeStrategySettings();
+    QList<Bar>* getBars(const QString &instrument, const QString &time_frame_str);
 
 public:
     explicit QuantTrader(QObject *parent = 0);
     ~QuantTrader();
+
+    static QuantTrader *instance;
+    AbstractIndicator* registerIndicator(const QString &instrument, const QString &time_frame_str, const QString &indicator_name, ...);
 
 signals:
 

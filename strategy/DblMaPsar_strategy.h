@@ -18,9 +18,9 @@ public:
     void onNewBar() override;
 
 protected:
-    MA *fast_ma;
-    MA *slow_ma;
-    ParabolicSAR *psar;
+    MQL5Indicator *fast_ma;
+    MQL5Indicator *slow_ma;
+    MQL5Indicator *psar;
 
 signals:
 

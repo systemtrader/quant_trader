@@ -1,6 +1,8 @@
 #include <QMetaEnum>
 #include <QDebug>
 
+#include "bar.h"
+#include "quant_trader.h"
 #include "DblMaPsar_strategy.h"
 
 static const int MA_METHOD_enumIdx = MA::staticMetaObject.indexOfEnumerator("ENUM_MA_METHOD");
@@ -38,9 +40,9 @@ void DblMaPsarStrategy::setParameter(int fastPeriod, int slowPeriod, MA::ENUM_MA
 {
     qDebug() << "fastPeriod = " << fastPeriod << ", slowPeriod = " << slowPeriod << ", ma_method = " << ma_method << ", applied_price = " << applied_price << ", SARStep = " << SARStep << ", SARMaximum = " << SARMaximum;
 
-    fast_ma = new MA(fastPeriod, 0, ma_method, applied_price, this);
-    slow_ma = new MA(slowPeriod, 0, ma_method, applied_price, this);
-    psar = new ParabolicSAR(SARStep, SARMaximum, this);
+    fast_ma = (MQL5Indicator*)QuantTrader::instance->registerIndicator(instrument, time_frame_str, "MA", fastPeriod, 0, ma_method, applied_price);
+    slow_ma = (MQL5Indicator*)QuantTrader::instance->registerIndicator(instrument, time_frame_str, "MA", slowPeriod, 0, ma_method, applied_price);
+    psar = (MQL5Indicator*)QuantTrader::instance->registerIndicator(instrument, time_frame_str, "MA", SARStep, SARMaximum);
 
     indicators.append(fast_ma);
     indicators.append(slow_ma);

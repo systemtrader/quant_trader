@@ -1,8 +1,9 @@
 #ifndef ABSTRACT_STRATEGY_H
 #define ABSTRACT_STRATEGY_H
 
-#include "bar_collector.h"
+#include <QObject>
 
+class Bar;
 class AbstractIndicator;
 
 class AbstractStrategy : public QObject
@@ -10,7 +11,9 @@ class AbstractStrategy : public QObject
     Q_OBJECT
     Q_ENUMS(BarCollector::TimeFrame)
 protected:
-    BarCollector::TimeFrame time_frame;
+    const QString instrument;
+    const QString time_frame_str;
+
     QList<AbstractIndicator*> indicators;
     QList<Bar> *barlist;
 
@@ -21,7 +24,7 @@ protected:
     bool isNewBar();
 
 public:
-    explicit AbstractStrategy(const QString& instrument, const QString& time_frame_str, QObject *parent = 0);
+    explicit AbstractStrategy(const QString& instr, const QString& time_frame, QObject *parent = 0);
     ~AbstractStrategy();
 
     // Should call setBarList after setParameter
