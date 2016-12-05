@@ -106,6 +106,8 @@ public:
     explicit MQL5Indicator(int indicator_buffers);
     ~MQL5Indicator();
 
+    virtual void OnInit() = 0;
+
     const IndicatorBuffer<double>& getBufferByIndex(const int index = 0) const {
         return *(indicator_buffers[index]);
     }
@@ -131,7 +133,6 @@ protected:
     void setBarList(QList<Bar> *list) override;
     void update() override;
 
-    virtual void OnInit() = 0;
     virtual void preCalculate();
 
     void SetIndexBuffer(

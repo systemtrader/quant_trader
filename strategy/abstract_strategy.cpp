@@ -28,9 +28,6 @@ bool AbstractStrategy::isNewBar()
 void AbstractStrategy::setBarList(QList<Bar> *list)
 {
     barlist = list;
-    foreach (AbstractIndicator* indicator, indicators) {
-        indicator->setBarList(list);
-    }
 }
 
 void AbstractStrategy::onNewTick(int volume, double turnover, double openInterest, int time, double lastPrice)

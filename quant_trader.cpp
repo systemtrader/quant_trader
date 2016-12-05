@@ -13,7 +13,6 @@ QuantTrader::QuantTrader(QObject *parent) :
     QObject(parent)
 {
     QuantTrader::instance = this;
-    registerIndicator("cu1701", "MIN1", "MA");
     loadQuantTraderSettings();
     loadTradeStrategySettings();
 
@@ -89,6 +88,7 @@ void QuantTrader::loadTradeStrategySettings()
         }
 
         strategy->setParameter(param1, param2, param3, param4, param5, param6, param7, param8, param9);
+        strategy->setBarList(getBars(instrument_name, time_frame));
         strategy_map.insert(instrument_name, strategy);
     }
 }
@@ -239,11 +239,12 @@ AbstractIndicator* QuantTrader::registerIndicator(const QString &instrument, con
     va_list ap;
     va_start(ap, indicator_name);
 
+    bool newCreate = false;
     if (indicator_name == "MA") {
         int period = va_arg(ap, int);
         int shift = va_arg(ap, int);
-        MA::ENUM_MA_METHOD ma_method = va_arg(ap, MA::ENUM_MA_METHOD);
-        MQL5IndicatorOnSingleDataBuffer::ENUM_APPLIED_PRICE applied_price = va_arg(ap, MQL5IndicatorOnSingleDataBuffer::ENUM_APPLIED_PRICE);
+        int ma_method = va_arg(ap, int);
+        int applied_price = va_arg(ap, int);
 
         foreach (AbstractIndicator *indicator, indicator_map.values("instrument")) {
             QObject *obj = (QObject*) indicator;
@@ -256,9 +257,8 @@ AbstractIndicator* QuantTrader::registerIndicator(const QString &instrument, con
             }
         }
         if (ret == nullptr) {
-            ret = new MA(period, shift, ma_method, applied_price, QuantTrader::instance);
-            indicator_map.insert(instrument, ret);
-            ret->setBarList(getBars(instrument, time_frame_str));
+            ret = new MA(period, shift, static_cast<MA::ENUM_MA_METHOD>(ma_method), static_cast<MQL5IndicatorOnSingleDataBuffer::ENUM_APPLIED_PRICE>(applied_price), QuantTrader::instance);
+            newCreate = true;
         }
     } else if (indicator_name == "ParabolicSAR") {
         double SARStep = va_arg(ap, double);
@@ -276,11 +276,17 @@ AbstractIndicator* QuantTrader::registerIndicator(const QString &instrument, con
         }
         if (ret == nullptr) {
             ret = new ParabolicSAR(SARStep, SARMaximum, QuantTrader::instance);
-            indicator_map.insert(instrument, ret);
-            ret->setBarList(getBars(instrument, time_frame_str));
+            newCreate = true;
         }
     }
     va_end(ap);
+
+    if (newCreate) {
+        indicator_map.insert(instrument, ret);
+        ((MQL5Indicator*)ret)->OnInit();
+        ret->setBarList(getBars(instrument, time_frame_str));
+        ret->update();
+    }
 
     return ret;
 }

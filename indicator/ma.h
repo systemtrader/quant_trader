@@ -24,6 +24,8 @@ public:
     Q_INVOKABLE explicit MA(int period, int shift, ENUM_MA_METHOD ma_method, MQL5IndicatorOnSingleDataBuffer::ENUM_APPLIED_PRICE applied_price = PRICE_CLOSE, QObject *parent = 0);
     ~MA() {}
 
+    void OnInit() override;
+
     int getMAPeroid() const { return InpMAPeriod; }
     int getMAShift() const { return InpMAShift; }
     ENUM_MA_METHOD getMAMethod() const { return InpMAMethod; }
@@ -40,7 +42,6 @@ protected:
     void CalculateLWMA(int rates_total,int prev_calculated,int begin,const _TimeSeries<double> &price);
     void CalculateSmoothedMA(int rates_total,int prev_calculated,int begin,const _TimeSeries<double> &price);
 
-    void OnInit() override;
     int OnCalculate (const int rates_total,                     // size of the price[] array
                      const int prev_calculated,                 // bars handled on a previous call
                      const int begin,                           // where the significant data start from

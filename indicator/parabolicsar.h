@@ -16,6 +16,8 @@ public:
     Q_INVOKABLE explicit ParabolicSAR(double step = 0.02, double maximum = 0.2, QObject *parent = 0);
     ~ParabolicSAR() {}
 
+    void OnInit() override;
+
     double getSARStep() const { return InpSARStep; }
     double getSARMaximum() const { return InpSARMaximum; }
 
@@ -32,7 +34,6 @@ protected:
     double ExtSarStep;
     double ExtSarMaximum;
 
-    void OnInit() override;
     int OnCalculate (const int rates_total,                     // size of input time series
                      const int prev_calculated,                 // bars handled in previous call
                      const _TimeSeries<uint>& time,             // Time
