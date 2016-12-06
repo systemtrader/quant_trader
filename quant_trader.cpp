@@ -6,7 +6,7 @@
 #include "indicator/parabolicsar.h"
 #include "strategy/DblMaPsar_strategy.h"
 
-static const int barCollector_enumIdx = BarCollector::staticMetaObject.indexOfEnumerator("TimeFrame");
+extern int barCollector_enumIdx;
 QuantTrader* QuantTrader::instance;
 
 QuantTrader::QuantTrader(QObject *parent) :
@@ -87,7 +87,7 @@ void QuantTrader::loadTradeStrategySettings()
         }
 
         strategy->setParameter(param1, param2, param3, param4, param5, param6, param7, param8, param9);
-        strategy->setBarList(getBars(instrument, time_frame));
+        strategy->setBarList(getBars(instrument, time_frame), collector_map[instrument]->getCurrentBar(time_frame));
         strategy_map.insert(instrument, strategy);
 
         if (position_map.contains(instrument)) {
@@ -290,7 +290,7 @@ AbstractIndicator* QuantTrader::registerIndicator(const QString &instrumentID, c
     if (newCreate) {
         indicator_map.insert(instrumentID, ret);
         ((MQL5Indicator*)ret)->OnInit();
-        ret->setBarList(getBars(instrumentID, time_frame_str));
+        ret->setBarList(getBars(instrumentID, time_frame_str), collector_map[instrumentID]->getCurrentBar(time_frame_str));
         ret->update();
     }
 

@@ -81,11 +81,11 @@ protected:
     T M::* pm;
 
 public:
-    RemapListMember(QList<M> *list, T M::* pmt, M &m) :
+    RemapListMember(QList<M> *list, T M::* pmt, M *m) :
         _TimeSeries<T>(false),
         mlist(list),
         pm(pmt),
-        lastM(&m) {
+        lastM(m) {
     }
 
     ~RemapListMember() {}
@@ -142,7 +142,7 @@ protected:
     _TimeSeries<long> *volume;
     _TimeSeries<int> *spread;
 
-    void setBarList(QList<Bar> *list, Bar &last) override;
+    void setBarList(QList<Bar> *list, Bar *last) override;
     void update() override;
 
     virtual void preCalculate();

@@ -1,7 +1,10 @@
 #include <QDataStream>
 #include <QDebug>
+#include <QMetaEnum>
 
 #include "bar_collector.h"
+
+const int barCollector_enumIdx = BarCollector::staticMetaObject.indexOfEnumerator("TimeFrame");
 
 static QDataStream& operator<<(QDataStream& s, const Bar& bar)
 {
@@ -16,11 +19,21 @@ static QDataStream& operator<<(QDataStream& s, const Bar& bar)
 
 BarCollector::BarCollector(const QString& instrumentID, TimeFrames time_frame_flags, QObject *parent) :
     QObject(parent),
-    instrument(instrumentID),
-    time_frame_flags(time_frame_flags | MIN1)
+    instrument(instrumentID)
 {
-    new_bar_open = true;
-    current_bar.init();
+    uint mask = 0x80;
+    while (mask != 0x00) {
+        int result = time_frame_flags & mask;
+        if (result != 0) {
+            bar_list_map.insert(static_cast<TimeFrame>(result), QList<Bar>());
+            current_bar_map.insert(static_cast<TimeFrame>(result), Bar());
+        }
+        mask >>= 1;
+    }
+    if (!bar_list_map.contains(TimeFrame::MIN1)) {
+        bar_list_map.insert(TimeFrame::MIN1, QList<Bar>());
+        current_bar_map.insert(TimeFrame::MIN1, Bar());
+    }
 }
 
 BarCollector::~BarCollector()
@@ -28,12 +41,11 @@ BarCollector::~BarCollector()
     saveBars();
 }
 
-void BarCollector::onNew1MinBar()
+Bar* BarCollector::getCurrentBar(QString time_frame_str)
 {
-    qDebug() << "onNew1MinBar()" << "\t" << current_bar.time;
-    one_min_bars.append(current_bar);
-    new_bar_open = true;
-    current_bar.init();
+    int time_frame_value = BarCollector::staticMetaObject.enumerator(barCollector_enumIdx).keyToValue(time_frame_str.trimmed().toLatin1().data());
+    TimeFrame time_frame = static_cast<BarCollector::TimeFrame>(time_frame_value);
+    return &current_bar_map[time_frame];
 }
 
 void BarCollector::saveBars()
@@ -49,20 +61,21 @@ void BarCollector::onNewTick(int volume, double turnover, double openInterest, i
         }
     }
 
-    if (new_bar_open) {
-        current_bar.open = lastPrice;
-        // TODO convert time value to time_t format
-        current_bar.time = time & 0xffff00;
-        new_bar_open = false;
-    }
+    foreach (Bar & bar, current_bar_map) {
+        if (bar.isNewBar()) {
+            bar.open = lastPrice;
+            // TODO convert time value to time_t format
+            bar.time = time & 0xffff00;
+        }
 
-    if (lastPrice > current_bar.high) {
-        current_bar.high = lastPrice;
-    }
+        if (lastPrice > bar.high) {
+            bar.high = lastPrice;
+        }
 
-    if (lastPrice < current_bar.low) {
-        current_bar.low = lastPrice;
-    }
+        if (lastPrice < bar.low) {
+            bar.low = lastPrice;
+        }
 
-    current_bar.close = lastPrice;
+        bar.close = lastPrice;
+    }
 }

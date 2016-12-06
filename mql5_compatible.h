@@ -91,7 +91,7 @@ protected:
     QList<T> * const data;
     T * lastT;
 public:
-    _ListProxy(QList<T> *list, T &last) :
+    _ListProxy(QList<T> *list, T *last) :
         _TimeSeries<T>(true),   // time series as default
         data(list),
         lastT(last) {

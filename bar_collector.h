@@ -26,15 +26,14 @@ public:
     explicit BarCollector(const QString& instrumentID, TimeFrames time_frame_flags, QObject *parent = 0);
     ~BarCollector();
 
+    Bar* getCurrentBar(QString time_frame_str);
+
 protected:
     const QString instrument;
-    const TimeFrames time_frame_flags;
 
-    bool new_bar_open;
-    QMap<TimeFrame, Bar> current_bar_map;
     QMap<TimeFrame, QList<Bar>> bar_list_map;
+    QMap<TimeFrame, Bar> current_bar_map;
 
-    void onNew1MinBar();
     void saveBars();
 
 signals:

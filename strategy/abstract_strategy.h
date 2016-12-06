@@ -37,9 +37,9 @@ public:
     }
 
     // Should call setBarList after setParameter
-    void setBarList(QList<Bar> *list, Bar &last) {
+    void setBarList(QList<Bar> *list, Bar *last) {
         barList = list;
-        lastBar = &last;
+        lastBar = last;
     }
 
     // Inherit from AbstractStrategy and overwite following virtual functions

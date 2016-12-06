@@ -39,7 +39,7 @@ public:
         volume(ktbar.m_fVolume) {
     }
 
-    inline void init() {
+    void init() {
         time = 0;
         tick_volume = 0;
         open = -1.5f;
@@ -47,6 +47,10 @@ public:
         low = 100000.0f;
         close = -1.0f;
         volume = 0.0f;
+    }
+
+    bool isNewBar() {
+        return open < 0.0f;
     }
 };
 
