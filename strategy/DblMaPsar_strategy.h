@@ -9,7 +9,7 @@ class DblMaPsarStrategy : public AbstractStrategy
 {
     Q_OBJECT
 public:
-    Q_INVOKABLE explicit DblMaPsarStrategy(const QString &id, const QString& instrument, const QString& time_frame, QObject *parent = 0);
+    Q_INVOKABLE explicit DblMaPsarStrategy(const QString &id, const QString& instrumentID, const QString& time_frame, QObject *parent = 0);
 
     void setParameter(const QVariant& param1, const QVariant& param2, const QVariant& param3,
                       const QVariant& param4, const QVariant& param5, const QVariant& param6,

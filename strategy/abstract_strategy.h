@@ -16,7 +16,8 @@ protected:
     const QString time_frame_str;
 
     QList<AbstractIndicator*> indicators;
-    QList<Bar> *barlist;
+    QList<Bar> *barList;
+    Bar *lastBar;
 
     QSettings *result;
     int position;
@@ -24,16 +25,22 @@ protected:
     double sl_price;
 
     bool isNewBar();
-    inline void resetPosition();
-    inline void saveResult();
+    void resetPosition();
+    void saveResult();
 
 public:
-    explicit AbstractStrategy(const QString& id, const QString& instr, const QString& time_frame, QObject *parent = 0);
+    explicit AbstractStrategy(const QString& id, const QString& instrumentID, const QString& time_frame, QObject *parent = 0);
     ~AbstractStrategy();
 
-    inline int getPosition();
+    int getPosition() {
+        return position;
+    }
+
     // Should call setBarList after setParameter
-    void setBarList(QList<Bar> *list);
+    void setBarList(QList<Bar> *list, Bar &last) {
+        barList = list;
+        lastBar = &last;
+    }
 
     // Inherit from AbstractStrategy and overwite following virtual functions
     virtual void setParameter(const QVariant& param1, const QVariant& param2, const QVariant& param3,

@@ -25,10 +25,10 @@ void QuantTrader::loadQuantTraderSettings()
 {
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "ctp", "quant_trader");
     settings.beginGroup("Collector");
-    QStringList instruments = settings.childKeys();
+    QStringList instrumentList = settings.childKeys();
 
-    foreach (const QString &str, instruments) {
-        QString time_frame_string_with_dots = settings.value(str).toString();
+    foreach (const QString &instrument, instrumentList) {
+        QString time_frame_string_with_dots = settings.value(instrument).toString();
         QStringList time_frame_stringlist = time_frame_string_with_dots.split('|');
         BarCollector::TimeFrames time_frame_flags;
         foreach (const QString &tf, time_frame_stringlist) {
@@ -37,9 +37,9 @@ void QuantTrader::loadQuantTraderSettings()
             time_frame_flags |= time_frame;
         }
 
-        BarCollector *collector = new BarCollector(time_frame_flags, this);
-        collector_map[str] = collector;
-        qDebug() << str << ":\t" << time_frame_flags << "\t" << time_frame_stringlist;
+        BarCollector *collector = new BarCollector(instrument, time_frame_flags, this);
+        collector_map[instrument] = collector;
+        qDebug() << instrument << ":\t" << time_frame_flags << "\t" << time_frame_stringlist;
     }
     settings.endGroup();
 }
@@ -57,7 +57,7 @@ void QuantTrader::loadTradeStrategySettings()
     foreach (const QString& group, groups) {
         settings.beginGroup(group);
         QString strategy_name = settings.value("strategy").toString();
-        QString instrument_name = settings.value("instrument").toString();
+        QString instrument = settings.value("instrument").toString();
         QString time_frame = settings.value("timeframe").toString();
 
         QVariant param1 = settings.value("param1");
@@ -73,7 +73,7 @@ void QuantTrader::loadTradeStrategySettings()
         settings.endGroup();
 
         const QMetaObject* strategy_meta_object = meta_object_map.value(strategy_name);
-        QObject *object = strategy_meta_object->newInstance(Q_ARG(QString, group), Q_ARG(QString, instrument_name), Q_ARG(QString, time_frame), Q_ARG(QObject*, this));
+        QObject *object = strategy_meta_object->newInstance(Q_ARG(QString, group), Q_ARG(QString, instrument), Q_ARG(QString, time_frame), Q_ARG(QObject*, this));
         if (object == NULL) {
             qDebug() << "Instantiating strategy " << group << " failed!";
             continue;
@@ -87,13 +87,13 @@ void QuantTrader::loadTradeStrategySettings()
         }
 
         strategy->setParameter(param1, param2, param3, param4, param5, param6, param7, param8, param9);
-        strategy->setBarList(getBars(instrument_name, time_frame));
-        strategy_map.insert(instrument_name, strategy);
+        strategy->setBarList(getBars(instrument, time_frame));
+        strategy_map.insert(instrument, strategy);
 
-        if (position_map.contains(instrument_name)) {
-            position_map[instrument_name] += strategy->getPosition();
+        if (position_map.contains(instrument)) {
+            position_map[instrument] += strategy->getPosition();
         } else {
-            position_map.insert(instrument_name, strategy->getPosition());
+            position_map.insert(instrument, strategy->getPosition());
         }
     }
 }
@@ -189,12 +189,12 @@ static QString getKTExportName(const QString &instrument) {
     return name + month;
 }
 
-QList<Bar>* QuantTrader::getBars(const QString &instrument, const QString &time_frame_str)
+QList<Bar>* QuantTrader::getBars(const QString &instrumentID, const QString &time_frame_str)
 {
     int time_frame_value = BarCollector::staticMetaObject.enumerator(barCollector_enumIdx).keyToValue(time_frame_str.trimmed().toLatin1().data());
-    if (bars_map.contains(instrument)) {
-        if (bars_map[instrument].contains(time_frame_value)) {
-            return bars_map[instrument][time_frame_value];
+    if (bars_map.contains(instrumentID)) {
+        if (bars_map[instrumentID].contains(time_frame_value)) {
+            return &bars_map[instrumentID][time_frame_value];
         }
     }
 
@@ -205,21 +205,22 @@ QList<Bar>* QuantTrader::getBars(const QString &instrument, const QString &time_
     settings.endGroup();
 
     // Load KT Export Data
-    const QString kt_export_file_name = kt_export_path + "/" + time_frame_str + "/" + getKTExportName(instrument) + getSuffix(instrument);
+    const QString kt_export_file_name = kt_export_path + "/" + time_frame_str + "/" + getKTExportName(instrumentID) + getSuffix(instrumentID);
     QFile kt_export_file(kt_export_file_name);
     kt_export_file.open(QFile::ReadOnly);
     QDataStream stream(&kt_export_file);
     stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
     stream.setByteOrder(QDataStream::LittleEndian);
-    QList<KTExportBar> *ktbarlist = new QList<KTExportBar>();
-    stream >> *ktbarlist;
-    QList<Bar> *barlist = new QList<Bar>();
-    foreach (const KTExportBar &ktbar, *ktbarlist) {
-        barlist->append(ktbar);
+
+    QList<Bar> *barList = &bars_map[instrumentID][time_frame_value];
+    QList<KTExportBar> ktBarList;
+    stream >> ktBarList;
+    foreach (const KTExportBar &ktbar, ktBarList) {
+        barList->append(ktbar);
     }
 
     // load Collector Bars
-    const QString collector_bar_path = collector_path + "/" + time_frame_str + "/" + getKTExportName(instrument);
+    const QString collector_bar_path = collector_path + "/" + time_frame_str + "/" + getKTExportName(instrumentID);
     QDir collector_bar_dir(collector_bar_path);
     QStringList entries = collector_bar_dir.entryList(QDir::Files | QDir::NoDotAndDotDot, QDir::Name);
     foreach (const QString &barfilename, entries) {
@@ -227,11 +228,10 @@ QList<Bar>* QuantTrader::getBars(const QString &instrument, const QString &time_
         barfile.open(QFile::ReadOnly);
         QDataStream stream(&kt_export_file);
         stream.setFloatingPointPrecision(QDataStream::DoublePrecision);
-        stream >> *barlist;
+        stream >> *barList;
     }
 
-    bars_map[instrument][time_frame_value] = barlist;
-    return barlist;
+    return barList;
 }
 
 QuantTrader::~QuantTrader()
@@ -239,7 +239,7 @@ QuantTrader::~QuantTrader()
     qDebug() << "~QuantTrader";
 }
 
-AbstractIndicator* QuantTrader::registerIndicator(const QString &instrument, const QString &time_frame_str, const QString &indicator_name, ...)
+AbstractIndicator* QuantTrader::registerIndicator(const QString &instrumentID, const QString &time_frame_str, const QString &indicator_name, ...)
 {
     AbstractIndicator* ret = nullptr;
     va_list ap;
@@ -288,9 +288,9 @@ AbstractIndicator* QuantTrader::registerIndicator(const QString &instrument, con
     va_end(ap);
 
     if (newCreate) {
-        indicator_map.insert(instrument, ret);
+        indicator_map.insert(instrumentID, ret);
         ((MQL5Indicator*)ret)->OnInit();
-        ret->setBarList(getBars(instrument, time_frame_str));
+        ret->setBarList(getBars(instrumentID, time_frame_str));
         ret->update();
     }
 

@@ -89,16 +89,28 @@ template<typename T>
 class _ListProxy : public _TimeSeries<T> {
 protected:
     QList<T> * const data;
+    T * lastT;
 public:
-    _ListProxy(QList<T> *list) :
+    _ListProxy(QList<T> *list, T &last) :
         _TimeSeries<T>(true),   // time series as default
-        data(list) {
+        data(list),
+        lastT(last) {
     }
     const T& operator[](int i) const {
+        const int size = data->size();
+
         if (this->is_time_series) {
-            return data->at(data->size() - 1 - i);
+            if (i == 0) {
+                return *lastT;
+            } else {
+                return data->at(size - i);
+            }
         } else {
-            return data->at(i);
+            if (i == size) {
+                return *lastT;
+            } else {
+                return data->at(i);
+            }
         }
     }
 };

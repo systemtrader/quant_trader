@@ -14,8 +14,9 @@ static QDataStream& operator<<(QDataStream& s, const Bar& bar)
     return s;
 }
 
-BarCollector::BarCollector(TimeFrames time_frame_flags, QObject *parent) :
+BarCollector::BarCollector(const QString& instrumentID, TimeFrames time_frame_flags, QObject *parent) :
     QObject(parent),
+    instrument(instrumentID),
     time_frame_flags(time_frame_flags | MIN1)
 {
     new_bar_open = true;
@@ -24,7 +25,7 @@ BarCollector::BarCollector(TimeFrames time_frame_flags, QObject *parent) :
 
 BarCollector::~BarCollector()
 {
-    //
+    saveBars();
 }
 
 void BarCollector::onNew1MinBar()
@@ -33,6 +34,11 @@ void BarCollector::onNew1MinBar()
     one_min_bars.append(current_bar);
     new_bar_open = true;
     current_bar.init();
+}
+
+void BarCollector::saveBars()
+{
+    // TODO
 }
 
 void BarCollector::onNewTick(int volume, double turnover, double openInterest, int time, double lastPrice)

@@ -15,7 +15,6 @@ SOURCES += main.cpp \
     indicator/ma.cpp \
     indicator/parabolicsar.cpp \
     indicator/mql5_indicator.cpp \
-    bar_series.cpp \
     strategy/abstract_strategy.cpp
 
 DBUS_INTERFACES += market_watcher.xml ctp_executer.xml

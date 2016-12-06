@@ -20,21 +20,21 @@ protected:
 
     // Following QString keys stands for instument names
     QMap<QString, BarCollector*> collector_map;
-    QMap<QString, QMap<int, QList<Bar>*>> bars_map;
+    QMap<QString, QMap<int, QList<Bar>>> bars_map;
     QMultiMap<QString, AbstractIndicator*> indicator_map;
     QMultiMap<QString, AbstractStrategy*> strategy_map;
     QMap<QString, int> position_map;
 
     void loadQuantTraderSettings();
     void loadTradeStrategySettings();
-    QList<Bar>* getBars(const QString &instrument, const QString &time_frame_str);
+    QList<Bar>* getBars(const QString &instrumentID, const QString &time_frame_str);
 
 public:
     explicit QuantTrader(QObject *parent = 0);
     ~QuantTrader();
 
     static QuantTrader *instance;
-    AbstractIndicator* registerIndicator(const QString &instrument, const QString &time_frame_str, const QString &indicator_name, ...);
+    AbstractIndicator* registerIndicator(const QString &instrumentID, const QString &time_frame_str, const QString &indicator_name, ...);
 
 signals:
 

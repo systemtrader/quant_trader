@@ -2,6 +2,7 @@
 #define BAR_COLLECTOR_H
 
 #include <QObject>
+#include <QMap>
 
 #include "bar.h"
 
@@ -22,16 +23,19 @@ public:
     };
     Q_DECLARE_FLAGS(TimeFrames, TimeFrame)
 
-    explicit BarCollector(TimeFrames time_frame_flags, QObject *parent = 0);
+    explicit BarCollector(const QString& instrumentID, TimeFrames time_frame_flags, QObject *parent = 0);
     ~BarCollector();
 
 protected:
+    const QString instrument;
     const TimeFrames time_frame_flags;
-    Bar current_bar;
+
     bool new_bar_open;
-    QList<Bar> one_min_bars;
+    QMap<TimeFrame, Bar> current_bar_map;
+    QMap<TimeFrame, QList<Bar>> bar_list_map;
 
     void onNew1MinBar();
+    void saveBars();
 
 signals:
     //void newBar(const Bar& bar);

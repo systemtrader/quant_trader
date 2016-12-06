@@ -1,8 +1,6 @@
 #ifndef MA_H
 #define MA_H
 
-#include <QObject>
-
 #include "mql5_indicator.h"
 
 class MA : public QObject, public MQL5IndicatorOnSingleDataBuffer

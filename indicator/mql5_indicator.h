@@ -76,23 +76,35 @@ public:
 template<typename M, typename T>
 class RemapListMember : public _TimeSeries<T> {
 protected:
-    QList<M>* barlist;
+    QList<M>* mlist;
+    M* lastM;
     T M::* pm;
 
 public:
-    RemapListMember(QList<M> *list, T M::* pmt) :
+    RemapListMember(QList<M> *list, T M::* pmt, M &m) :
         _TimeSeries<T>(false),
-        barlist(list),
-        pm(pmt) {
+        mlist(list),
+        pm(pmt),
+        lastM(&m) {
     }
 
     ~RemapListMember() {}
 
     const T& operator[](int i) const {
+        const int size = mlist->size();
+
         if (this->is_time_series) {
-            return barlist->at(barlist->size() - 1 - i).*pm;
+            if (i == 0) {
+                return lastM->*pm;
+            } else {
+                return mlist->at(size - i).*pm;
+            }
         } else {
-            return barlist->at(i).*pm;
+            if (i == size) {
+                return lastM->*pm;
+            } else {
+                return mlist->at(i).*pm;
+            }
         }
     }
 };
@@ -130,7 +142,7 @@ protected:
     _TimeSeries<long> *volume;
     _TimeSeries<int> *spread;
 
-    void setBarList(QList<Bar> *list) override;
+    void setBarList(QList<Bar> *list, Bar &last) override;
     void update() override;
 
     virtual void preCalculate();

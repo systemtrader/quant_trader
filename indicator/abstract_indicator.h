@@ -9,13 +9,14 @@ class AbstractIndicator
 {
     Q_GADGET
 protected:
-    QList<Bar> *barlist;
+    QList<Bar> *barList;
+    Bar *lastBar;
 
 public:
     explicit AbstractIndicator();
     virtual ~AbstractIndicator();
 
-    virtual void setBarList(QList<Bar> *list);
+    virtual void setBarList(QList<Bar> *list, Bar &last);
     virtual void update() = 0;
 };
 

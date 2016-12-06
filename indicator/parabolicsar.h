@@ -1,8 +1,6 @@
 #ifndef PARABOLICSAR_H
 #define PARABOLICSAR_H
 
-#include <QObject>
-
 #include "mql5_indicator.h"
 
 class ParabolicSAR : public QObject, public MQL5Indicator

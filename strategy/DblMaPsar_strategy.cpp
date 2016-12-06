@@ -8,10 +8,10 @@
 static const int MA_METHOD_enumIdx = MA::staticMetaObject.indexOfEnumerator("ENUM_MA_METHOD");
 static const int APPLIED_PRICE_enumIdx = MQL5IndicatorOnSingleDataBuffer::staticMetaObject.indexOfEnumerator("ENUM_APPLIED_PRICE");
 
-DblMaPsarStrategy::DblMaPsarStrategy(const QString &id, const QString& instrument, const QString& time_frame, QObject *parent) :
-    AbstractStrategy(id, instrument, time_frame, parent)
+DblMaPsarStrategy::DblMaPsarStrategy(const QString &id, const QString& instrumentID, const QString& time_frame, QObject *parent) :
+    AbstractStrategy(id, instrumentID, time_frame, parent)
 {
-    qDebug() << "id = " << id << ", instrument = " << instrument << ", time_frame = " << time_frame;
+    //
 }
 
 void DblMaPsarStrategy::setParameter(const QVariant& param1, const QVariant& param2, const QVariant& param3,
@@ -59,7 +59,7 @@ void DblMaPsarStrategy::onNewBar()
     ArraySetAsSeries(slow_ma_buf, true);
     ArraySetAsSeries(psar_buf, true);
 
-    _ListProxy<Bar> bars(barlist);
+    _ListProxy<Bar> bars(barList);
 
     if (fast_ma_buf[1] > slow_ma_buf[1] && fast_ma_buf[2] <= slow_ma_buf[2]) {
         if (psar_buf[1] < bars[1].low) {
