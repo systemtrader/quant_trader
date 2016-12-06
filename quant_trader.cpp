@@ -60,14 +60,6 @@ void QuantTrader::loadTradeStrategySettings()
         QString instrument_name = settings.value("instrument").toString();
         QString time_frame = settings.value("timeframe").toString();
 
-        const QMetaObject* strategy_meta_object = meta_object_map.value(strategy_name);
-        QObject *object = strategy_meta_object->newInstance(Q_ARG(QString, instrument_name), Q_ARG(QString, time_frame), Q_ARG(QObject*, this));
-        if (object == NULL) {
-            qDebug() << "Instantiating strategy " << group << " failed!";
-            settings.endGroup();
-            continue;
-        }
-
         QVariant param1 = settings.value("param1");
         QVariant param2 = settings.value("param2");
         QVariant param3 = settings.value("param3");
@@ -80,6 +72,13 @@ void QuantTrader::loadTradeStrategySettings()
 
         settings.endGroup();
 
+        const QMetaObject* strategy_meta_object = meta_object_map.value(strategy_name);
+        QObject *object = strategy_meta_object->newInstance(Q_ARG(QString, group), Q_ARG(QString, instrument_name), Q_ARG(QString, time_frame), Q_ARG(QObject*, this));
+        if (object == NULL) {
+            qDebug() << "Instantiating strategy " << group << " failed!";
+            continue;
+        }
+
         AbstractStrategy *strategy = qobject_cast<AbstractStrategy*>(object);
         if (strategy == NULL) {
             qDebug() << "Cast strategy " << group << " failed!";
@@ -90,6 +89,12 @@ void QuantTrader::loadTradeStrategySettings()
         strategy->setParameter(param1, param2, param3, param4, param5, param6, param7, param8, param9);
         strategy->setBarList(getBars(instrument_name, time_frame));
         strategy_map.insert(instrument_name, strategy);
+
+        if (position_map.contains(instrument_name)) {
+            position_map[instrument_name] += strategy->getPosition();
+        } else {
+            position_map.insert(instrument_name, strategy->getPosition());
+        }
     }
 }
 
@@ -138,38 +143,39 @@ static const QStringList ZJ = {"ic", "if", "ih", "t",  "tf"};
 
 #define String const QString&
 static QString getSuffix(String instrument) {
+    const QString instrumentLowerCase = instrument.toLower();
     for (String instr :SQ) {
-        if (instrument.toLower() == instr) {
+        if (instrumentLowerCase == instr) {
             return ".SQ";
         }
     }
     for (String instr :SY) {
-        if (instrument.toLower() == instr) {
+        if (instrumentLowerCase == instr) {
             return ".SY";
         }
     }
     for (String instr :DL) {
-        if (instrument.toLower() == instr) {
+        if (instrumentLowerCase == instr) {
             return ".DL";
         }
     }
     for (String instr :DY) {
-        if (instrument.toLower() == instr) {
+        if (instrumentLowerCase == instr) {
             return ".DY";
         }
     }
     for (String instr :ZZ) {
-        if (instrument.toLower() == instr) {
+        if (instrumentLowerCase == instr) {
             return ".ZZ";
         }
     }
     for (String instr :ZY) {
-        if (instrument.toLower() == instr) {
+        if (instrumentLowerCase == instr) {
             return ".ZY";
         }
     }
     for (String instr :ZJ) {
-        if (instrument.toLower() == instr) {
+        if (instrumentLowerCase == instr) {
             return ".ZJ";
         }
     }
@@ -299,8 +305,14 @@ void QuantTrader::onNewTick(int volume, double turnover, double openInterest, in
     }
 
     QList<AbstractStrategy *> strategies = strategy_map.values(instrumentID);
+    int new_position_sum = 0;
     foreach (AbstractStrategy *strategy, strategies) {
         strategy->onNewTick(volume, turnover, openInterest, time, lastPrice);
+        new_position_sum += strategy->getPosition();
+    }
+    if (position_map[instrumentID] != new_position_sum) {
+        position_map[instrumentID] = new_position_sum;
+        pExecuter->setPosition(instrumentID, new_position_sum);
     }
 }
 

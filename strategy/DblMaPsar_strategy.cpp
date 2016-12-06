@@ -8,10 +8,10 @@
 static const int MA_METHOD_enumIdx = MA::staticMetaObject.indexOfEnumerator("ENUM_MA_METHOD");
 static const int APPLIED_PRICE_enumIdx = MQL5IndicatorOnSingleDataBuffer::staticMetaObject.indexOfEnumerator("ENUM_APPLIED_PRICE");
 
-DblMaPsarStrategy::DblMaPsarStrategy(const QString& instrument, const QString& time_frame, QObject *parent) :
-    AbstractStrategy(instrument, time_frame, parent)
+DblMaPsarStrategy::DblMaPsarStrategy(const QString &id, const QString& instrument, const QString& time_frame, QObject *parent) :
+    AbstractStrategy(id, instrument, time_frame, parent)
 {
-    qDebug() << instrument << "\t" << time_frame;
+    qDebug() << "id = " << id << ", instrument = " << instrument << ", time_frame = " << time_frame;
 }
 
 void DblMaPsarStrategy::setParameter(const QVariant& param1, const QVariant& param2, const QVariant& param3,

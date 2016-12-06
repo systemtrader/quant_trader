@@ -5,32 +5,37 @@
 
 class Bar;
 class AbstractIndicator;
+class QSettings;
 
 class AbstractStrategy : public QObject
 {
     Q_OBJECT
-    Q_ENUMS(BarCollector::TimeFrame)
 protected:
+    const QString stratety_id;
     const QString instrument;
     const QString time_frame_str;
 
     QList<AbstractIndicator*> indicators;
     QList<Bar> *barlist;
 
+    QSettings *result;
     int position;
     double tp_price;
     double sl_price;
 
     bool isNewBar();
+    inline void resetPosition();
+    inline void saveResult();
 
 public:
-    explicit AbstractStrategy(const QString& instr, const QString& time_frame, QObject *parent = 0);
+    explicit AbstractStrategy(const QString& id, const QString& instr, const QString& time_frame, QObject *parent = 0);
     ~AbstractStrategy();
 
+    inline int getPosition();
     // Should call setBarList after setParameter
     void setBarList(QList<Bar> *list);
 
-    // Inherit from AbstractStrategy and overwite following functions
+    // Inherit from AbstractStrategy and overwite following virtual functions
     virtual void setParameter(const QVariant& param1, const QVariant& param2, const QVariant& param3,
                               const QVariant& param4, const QVariant& param5, const QVariant& param6,
                               const QVariant& param7, const QVariant& param8, const QVariant& param9) = 0;
