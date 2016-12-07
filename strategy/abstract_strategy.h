@@ -46,7 +46,7 @@ public:
     virtual void setParameter(const QVariant& param1, const QVariant& param2, const QVariant& param3,
                               const QVariant& param4, const QVariant& param5, const QVariant& param6,
                               const QVariant& param7, const QVariant& param8, const QVariant& param9) = 0;
-    virtual void onNewTick(int volume, double turnover, double openInterest, int time, double lastPrice);
+    virtual void onNewTick(int volume, double turnover, double openInterest, uint time, double lastPrice);
     virtual void onNewBar() = 0;
     virtual void checkTPSL(double price);
 

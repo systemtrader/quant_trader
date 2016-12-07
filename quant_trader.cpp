@@ -1,6 +1,7 @@
 #include <QSettings>
 
 #include "quant_trader.h"
+#include "bar.h"
 #include "bar_collector.h"
 #include "indicator/ma.h"
 #include "indicator/parabolicsar.h"
@@ -18,7 +19,7 @@ QuantTrader::QuantTrader(QObject *parent) :
 
     pExecuter = new org::ctp::ctp_executer("org.ctp.ctp_executer", "/ctp_executer", QDBusConnection::sessionBus(), this);
     pWatcher = new org::ctp::market_watcher("org.ctp.market_watcher", "/market_watcher", QDBusConnection::sessionBus(), this);
-    connect(pWatcher, SIGNAL(newTick(int,double,double,int,double,QString)), this, SLOT(onNewTick(int,double,double,int,double,QString)));
+    connect(pWatcher, SIGNAL(newTick(int,double,double,uint,double,QString)), this, SLOT(onNewTick(int,double,double,uint,double,QString)));
 }
 
 void QuantTrader::loadQuantTraderSettings()
@@ -297,7 +298,7 @@ AbstractIndicator* QuantTrader::registerIndicator(const QString &instrumentID, c
     return ret;
 }
 
-void QuantTrader::onNewTick(int volume, double turnover, double openInterest, int time, double lastPrice, const QString &instrumentID)
+void QuantTrader::onNewTick(int volume, double turnover, double openInterest, uint time, double lastPrice, const QString &instrumentID)
 {
     BarCollector *collector = collector_map.value(instrumentID, nullptr);
     if (collector != nullptr) {

@@ -5,7 +5,7 @@
       <arg name="volume" type="i" direction="out"/>
       <arg name="turnover" type="d" direction="out"/>
       <arg name="openInterest" type="d" direction="out"/>
-      <arg name="time" type="i" direction="out"/>
+      <arg name="time" type="u" direction="out"/>
       <arg name="lastPrice" type="d" direction="out"/>
       <arg name="instrumentID" type="s" direction="out"/>
     </signal>

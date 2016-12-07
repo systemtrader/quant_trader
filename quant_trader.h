@@ -39,7 +39,7 @@ public:
 signals:
 
 public slots:
-    void onNewTick(int volume, double turnover, double openInterest, int time, double lastPrice, const QString &instrumentID);
+    void onNewTick(int volume, double turnover, double openInterest, uint time, double lastPrice, const QString &instrumentID);
 };
 
 #endif // QUANT_TRADER_H

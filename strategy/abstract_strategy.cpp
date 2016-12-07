@@ -3,6 +3,7 @@
 #include <QDateTime>
 #include <QDebug>
 
+#include "bar.h"
 #include "abstract_strategy.h"
 #include "indicator/abstract_indicator.h"
 
@@ -27,11 +28,9 @@ AbstractStrategy::~AbstractStrategy()
     delete result;
 }
 
-bool AbstractStrategy::isNewBar()
+inline bool AbstractStrategy::isNewBar()
 {
-    bool is_new_bar = false;
-    // TODO
-    return is_new_bar;
+    return lastBar->tick_volume == 1;
 }
 
 inline void AbstractStrategy::resetPosition()
@@ -50,7 +49,7 @@ inline void AbstractStrategy::saveResult()
     result->setValue("sl_price", sl_price);
 }
 
-void AbstractStrategy::onNewTick(int volume, double turnover, double openInterest, int time, double lastPrice)
+void AbstractStrategy::onNewTick(int volume, double turnover, double openInterest, uint time, double lastPrice)
 {
     foreach (AbstractIndicator* indicator, indicators) {
         indicator->update();

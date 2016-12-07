@@ -2,9 +2,10 @@
 #include <QDebug>
 #include <QMetaEnum>
 
+#include "bar.h"
 #include "bar_collector.h"
 
-const int barCollector_enumIdx = BarCollector::staticMetaObject.indexOfEnumerator("TimeFrame");
+int barCollector_enumIdx = BarCollector::staticMetaObject.indexOfEnumerator("TimeFrame");
 
 static QDataStream& operator<<(QDataStream& s, const Bar& bar)
 {
@@ -21,18 +22,20 @@ BarCollector::BarCollector(const QString& instrumentID, TimeFrames time_frame_fl
     QObject(parent),
     instrument(instrumentID)
 {
+    QSet<TimeFrame> key_set;
     uint mask = 0x80;
     while (mask != 0x00) {
         int result = time_frame_flags & mask;
         if (result != 0) {
-            bar_list_map.insert(static_cast<TimeFrame>(result), QList<Bar>());
-            current_bar_map.insert(static_cast<TimeFrame>(result), Bar());
+            key_set.insert(static_cast<TimeFrame>(result));
         }
         mask >>= 1;
     }
-    if (!bar_list_map.contains(TimeFrame::MIN1)) {
-        bar_list_map.insert(TimeFrame::MIN1, QList<Bar>());
-        current_bar_map.insert(TimeFrame::MIN1, Bar());
+    key_set.insert(TimeFrame::MIN1);
+    keys = key_set.toList();
+    foreach (const auto key, keys) {
+        bar_list_map.insert(key, QList<Bar>());
+        current_bar_map.insert(key, Bar());
     }
 }
 
@@ -41,7 +44,7 @@ BarCollector::~BarCollector()
     saveBars();
 }
 
-Bar* BarCollector::getCurrentBar(QString time_frame_str)
+Bar* BarCollector::getCurrentBar(const QString &time_frame_str)
 {
     int time_frame_value = BarCollector::staticMetaObject.enumerator(barCollector_enumIdx).keyToValue(time_frame_str.trimmed().toLatin1().data());
     TimeFrame time_frame = static_cast<BarCollector::TimeFrame>(time_frame_value);
@@ -53,19 +56,37 @@ void BarCollector::saveBars()
     // TODO
 }
 
-void BarCollector::onNewTick(int volume, double turnover, double openInterest, int time, double lastPrice)
-{
-    if (current_bar.open > 0.0f) {
-        if ((time >> 8) > (current_bar.time >> 8)) {
-            onNew1MinBar();
-        }
-    }
+#define MIN_UNIT    60
+#define HOUR_UNIT   3600
 
-    foreach (Bar & bar, current_bar_map) {
+QMap<BarCollector::TimeFrame, int> createTimeTable() {
+    QMap<BarCollector::TimeFrame, int> timeTable;
+    timeTable.insert(BarCollector::MIN1, 1 * MIN_UNIT);
+    timeTable.insert(BarCollector::MIN5, 5 * MIN_UNIT);
+    timeTable.insert(BarCollector::MIN15, 15 * MIN_UNIT);
+    timeTable.insert(BarCollector::MIN60, 1 * HOUR_UNIT);
+    return timeTable;
+}
+
+const QMap<BarCollector::TimeFrame, int> g_time_table = createTimeTable();
+
+void BarCollector::onNewTick(int volume, double turnover, double openInterest, uint time, double lastPrice)
+{
+    foreach (const auto key, keys) {
+        Bar & bar = current_bar_map[key];
+        const int time_unit = g_time_table[key];  // TODO optimize, use time_unit as key
+
+        if (bar.tick_volume > 0) {
+            if ((time / time_unit) > (bar.time / time_unit)) {
+                bar_list_map[key].append(bar);
+                bar.init();
+            }
+        }
+
         if (bar.isNewBar()) {
             bar.open = lastPrice;
             // TODO convert time value to time_t format
-            bar.time = time & 0xffff00;
+            bar.time = time / time_unit * time_unit;
         }
 
         if (lastPrice > bar.high) {
@@ -77,5 +98,6 @@ void BarCollector::onNewTick(int volume, double turnover, double openInterest, i
         }
 
         bar.close = lastPrice;
+        bar.tick_volume ++;
     }
 }

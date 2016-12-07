@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QMap>
 
-#include "bar.h"
+class Bar;
 
 class BarCollector : public QObject
 {
@@ -26,11 +26,11 @@ public:
     explicit BarCollector(const QString& instrumentID, TimeFrames time_frame_flags, QObject *parent = 0);
     ~BarCollector();
 
-    Bar* getCurrentBar(QString time_frame_str);
+    Bar* getCurrentBar(const QString &time_frame_str);
 
 protected:
     const QString instrument;
-
+    QList<TimeFrame> keys;
     QMap<TimeFrame, QList<Bar>> bar_list_map;
     QMap<TimeFrame, Bar> current_bar_map;
 
@@ -39,7 +39,7 @@ protected:
 signals:
     //void newBar(const Bar& bar);
 public slots:
-    void onNewTick(int volume, double turnover, double openInterest, int time, double lastPrice);
+    void onNewTick(int volume, double turnover, double openInterest, uint time, double lastPrice);
 };
 
 #endif // BAR_COLLECTOR_H

@@ -50,7 +50,7 @@ public:
     }
 
     bool isNewBar() {
-        return open < 0.0f;
+        return tick_volume == 0;
     }
 };
 
