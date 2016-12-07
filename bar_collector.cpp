@@ -5,7 +5,7 @@
 #include "bar.h"
 #include "bar_collector.h"
 
-int barCollector_enumIdx = BarCollector::staticMetaObject.indexOfEnumerator("TimeFrame");
+extern int barCollector_enumIdx;
 
 static QDataStream& operator<<(QDataStream& s, const Bar& bar)
 {
@@ -18,7 +18,7 @@ static QDataStream& operator<<(QDataStream& s, const Bar& bar)
     return s;
 }
 
-BarCollector::BarCollector(const QString& instrumentID, TimeFrames time_frame_flags, QObject *parent) :
+BarCollector::BarCollector(const QString& instrumentID, const TimeFrames &time_frame_flags, QObject *parent) :
     QObject(parent),
     instrument(instrumentID)
 {

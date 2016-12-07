@@ -5,8 +5,8 @@
 #include "quant_trader.h"
 #include "DblMaPsar_strategy.h"
 
-static const int MA_METHOD_enumIdx = MA::staticMetaObject.indexOfEnumerator("ENUM_MA_METHOD");
-static const int APPLIED_PRICE_enumIdx = MQL5IndicatorOnSingleDataBuffer::staticMetaObject.indexOfEnumerator("ENUM_APPLIED_PRICE");
+extern int MA_METHOD_enumIdx;
+extern int APPLIED_PRICE_enumIdx;
 
 DblMaPsarStrategy::DblMaPsarStrategy(const QString &id, const QString& instrumentID, const QString& time_frame, QObject *parent) :
     AbstractStrategy(id, instrumentID, time_frame, parent)

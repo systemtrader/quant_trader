@@ -23,7 +23,7 @@ public:
     };
     Q_DECLARE_FLAGS(TimeFrames, TimeFrame)
 
-    explicit BarCollector(const QString& instrumentID, TimeFrames time_frame_flags, QObject *parent = 0);
+    explicit BarCollector(const QString& instrumentID, const TimeFrames &time_frame_flags, QObject *parent = 0);
     ~BarCollector();
 
     Bar* getCurrentBar(const QString &time_frame_str);
