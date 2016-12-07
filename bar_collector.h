@@ -37,7 +37,7 @@ protected:
     void saveBars();
 
 signals:
-    //void newBar(const Bar& bar);
+    void collectedBar(TimeFrame timeFrame, const Bar& bar);
 public slots:
     void onNewTick(int volume, double turnover, double openInterest, uint time, double lastPrice);
 };
