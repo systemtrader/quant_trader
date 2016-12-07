@@ -1,6 +1,8 @@
 #ifndef BAR_H
 #define BAR_H
 
+#include <QMetaType>
+
 #define TimeType int
 typedef unsigned short      WORD;
 
@@ -53,6 +55,8 @@ public:
         return tick_volume == 0;
     }
 };
+
+Q_DECLARE_METATYPE(Bar);
 
 #endif // BAR_H
 

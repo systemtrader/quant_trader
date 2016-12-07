@@ -26,6 +26,7 @@ public:
     explicit BarCollector(const QString& instrumentID, const TimeFrames &time_frame_flags, QObject *parent = 0);
     ~BarCollector();
 
+    static QString collector_dir;
     Bar* getCurrentBar(const QString &time_frame_str);
 
 protected:
@@ -37,7 +38,7 @@ protected:
     void saveBars();
 
 signals:
-    void collectedBar(TimeFrame timeFrame, const Bar& bar);
+    void collectedBar(const QString& instrumentID, int time_frame, const Bar& bar);
 public slots:
     void onNewTick(int volume, double turnover, double openInterest, uint time, double lastPrice);
 };

@@ -33,6 +33,7 @@ QuantTrader::QuantTrader(QObject *parent) :
 void QuantTrader::loadQuantTraderSettings()
 {
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "ctp", "quant_trader");
+
     settings.beginGroup("Collector");
     QStringList instrumentList = settings.childKeys();
 
@@ -50,6 +51,11 @@ void QuantTrader::loadQuantTraderSettings()
         collector_map[instrument] = collector;
         qDebug() << instrument << ":\t" << time_frame_flags << "\t" << time_frame_stringlist;
     }
+    settings.endGroup();
+
+    settings.beginGroup("HistoryPath");
+    kt_export_dir = settings.value("ktexport").toString();
+    BarCollector::collector_dir = settings.value("collector").toString();
     settings.endGroup();
 }
 
@@ -219,14 +225,8 @@ QList<Bar>* QuantTrader::getBars(const QString &instrumentID, const QString &tim
         }
     }
 
-    QSettings settings(QSettings::IniFormat, QSettings::UserScope, "ctp", "quant_trader");
-    settings.beginGroup("HistoryPath");
-    QString kt_export_path = settings.value("ktexport").toString();
-    QString collector_path = settings.value("collector").toString();
-    settings.endGroup();
-
     // Load KT Export Data
-    const QString kt_export_file_name = kt_export_path + "/" + time_frame_str + "/" + getKTExportName(instrumentID) + getSuffix(instrumentID);
+    const QString kt_export_file_name = kt_export_dir + "/" + time_frame_str + "/" + getKTExportName(instrumentID) + getSuffix(instrumentID);
     QFile kt_export_file(kt_export_file_name);
     kt_export_file.open(QFile::ReadOnly);
     QDataStream stream(&kt_export_file);
@@ -242,7 +242,7 @@ QList<Bar>* QuantTrader::getBars(const QString &instrumentID, const QString &tim
     }
 
     // load Collector Bars
-    const QString collector_bar_path = collector_path + "/" + time_frame_str + "/" + getKTExportName(instrumentID);
+    const QString collector_bar_path = BarCollector::collector_dir + "/" + time_frame_str + "/" + instrumentID;
     QDir collector_bar_dir(collector_bar_path);
     QStringList entries = collector_bar_dir.entryList(QDir::Files | QDir::NoDotAndDotDot, QDir::Name);
     foreach (const QString &barfilename, entries) {
@@ -251,6 +251,12 @@ QList<Bar>* QuantTrader::getBars(const QString &instrumentID, const QString &tim
         QDataStream stream(&kt_export_file);
         stream.setFloatingPointPrecision(QDataStream::DoublePrecision);
         stream >> *barList;
+    }
+
+    if (collector_map.contains(instrumentID)) {
+        connect(collector_map[instrumentID], SIGNAL(collectedBar(QString,int,Bar)), this, SLOT(onNewBar(QString,int,Bar)), Qt::DirectConnection);
+    } else {
+        qDebug() << "Warning! Missing collector for " << instrumentID << " !";
     }
 
     return barList;
@@ -338,3 +344,7 @@ void QuantTrader::onNewTick(int volume, double turnover, double openInterest, ui
     }
 }
 
+void QuantTrader::onNewBar(const QString &instrumentID, int time_frame, const Bar &bar)
+{
+    bars_map[instrumentID][time_frame].append(bar);
+}

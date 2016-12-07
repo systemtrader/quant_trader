@@ -1,15 +1,19 @@
 #include <QDataStream>
 #include <QDebug>
 #include <QMetaEnum>
+#include <QDateTime>
+#include <QFile>
 
 #include "bar.h"
 #include "bar_collector.h"
 
 extern int barCollector_enumIdx;
+QString BarCollector::collector_dir;
 
 static QDataStream& operator<<(QDataStream& s, const Bar& bar)
 {
     s << bar.time;
+    s << bar.tick_volume;
     s << bar.open;
     s << bar.high;
     s << bar.low;
@@ -53,7 +57,17 @@ Bar* BarCollector::getCurrentBar(const QString &time_frame_str)
 
 void BarCollector::saveBars()
 {
-    // TODO
+    foreach (const auto key, keys) {
+        auto & barList = bar_list_map[key];
+        QString time_frame_str = BarCollector::staticMetaObject.enumerator(barCollector_enumIdx).valueToKey(key);
+        QString file_name = collector_dir + "/" + time_frame_str + "/" + instrument + "/" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss_zzz") + ".bar";
+        QFile barFile(file_name);
+        barFile.open(QFile::WriteOnly);
+        QDataStream wstream(&barFile);
+        wstream.setFloatingPointPrecision(QDataStream::DoublePrecision);
+        wstream << barList;
+        barList.clear();
+    }
 }
 
 #define MIN_UNIT    60
@@ -79,6 +93,7 @@ void BarCollector::onNewTick(int volume, double turnover, double openInterest, u
         if (bar.tick_volume > 0) {
             if ((time / time_unit) > (bar.time / time_unit)) {
                 bar_list_map[key].append(bar);
+                emit collectedBar(instrument, key, bar);
                 bar.init();
             }
         }

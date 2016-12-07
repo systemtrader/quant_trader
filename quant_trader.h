@@ -25,6 +25,7 @@ protected:
     QMultiMap<QString, AbstractStrategy*> strategy_map;
     QMap<QString, int> position_map;
 
+    QString kt_export_dir;
     void loadQuantTraderSettings();
     void loadTradeStrategySettings();
     QList<Bar>* getBars(const QString &instrumentID, const QString &time_frame_str);
@@ -38,8 +39,9 @@ public:
 
 signals:
 
-public slots:
+private slots:
     void onNewTick(int volume, double turnover, double openInterest, uint time, double lastPrice, const QString &instrumentID);
+    void onNewBar(const QString &instrumentID, int time_frame, const Bar& bar);
 };
 
 #endif // QUANT_TRADER_H
