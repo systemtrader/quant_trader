@@ -77,8 +77,8 @@ template<typename M, typename T>
 class RemapListMember : public _TimeSeries<T> {
 protected:
     QList<M>* mlist;
-    M* lastM;
     T M::* pm;
+    M* lastM;
 
 public:
     RemapListMember(QList<M> *list, T M::* pmt, M *m) :
