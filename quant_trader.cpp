@@ -267,7 +267,7 @@ QuantTrader::~QuantTrader()
     qDebug() << "~QuantTrader";
 }
 
-AbstractIndicator* QuantTrader::registerIndicator(const QString &instrumentID, const QString &time_frame_str, const QString &indicator_name, ...)
+AbstractIndicator* QuantTrader::registerIndicator(const QString &instrumentID, const QString &time_frame_str, QString indicator_name, ...)
 {
     AbstractIndicator* ret = nullptr;
     va_list ap;

@@ -35,7 +35,7 @@ public:
     ~QuantTrader();
 
     static QuantTrader *instance;
-    AbstractIndicator* registerIndicator(const QString &instrumentID, const QString &time_frame_str, const QString &indicator_name, ...);
+    AbstractIndicator* registerIndicator(const QString &instrumentID, const QString &time_frame_str, QString indicator_name, ...);
 
 signals:
 

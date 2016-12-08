@@ -42,7 +42,7 @@ void DblMaPsarStrategy::setParameter(int fastPeriod, int slowPeriod, MA::ENUM_MA
 
     fast_ma = (MQL5Indicator*)QuantTrader::instance->registerIndicator(instrument, time_frame_str, "MA", fastPeriod, 0, ma_method, applied_price);
     slow_ma = (MQL5Indicator*)QuantTrader::instance->registerIndicator(instrument, time_frame_str, "MA", slowPeriod, 0, ma_method, applied_price);
-    psar = (MQL5Indicator*)QuantTrader::instance->registerIndicator(instrument, time_frame_str, "MA", SARStep, SARMaximum);
+    psar = (MQL5Indicator*)QuantTrader::instance->registerIndicator(instrument, time_frame_str, "ParabolicSAR", SARStep, SARMaximum);
 
     indicators.append(fast_ma);
     indicators.append(slow_ma);
