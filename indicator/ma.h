@@ -19,7 +19,7 @@ public:
         MODE_LWMA,  // Linear-weighted averaging
     };
 
-    Q_INVOKABLE explicit MA(int period, int shift, ENUM_MA_METHOD ma_method, MQL5IndicatorOnSingleDataBuffer::ENUM_APPLIED_PRICE applied_price = PRICE_CLOSE, QObject *parent = 0);
+    Q_INVOKABLE explicit MA(int period, int shift, ENUM_MA_METHOD ma_method, ENUM_APPLIED_PRICE applied_price = PRICE_CLOSE, QObject *parent = 0);
     ~MA() {}
 
     void OnInit() override;

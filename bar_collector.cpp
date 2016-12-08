@@ -13,7 +13,7 @@ QString BarCollector::collector_dir;
 static QDataStream& operator<<(QDataStream& s, const Bar& bar)
 {
     s << bar.time;
-    s << bar.tick_volume;
+    s << (qint32)bar.tick_volume;
     s << bar.open;
     s << bar.high;
     s << bar.low;
@@ -60,7 +60,7 @@ void BarCollector::saveBars()
     foreach (const auto key, keys) {
         auto & barList = bar_list_map[key];
         QString time_frame_str = BarCollector::staticMetaObject.enumerator(barCollector_enumIdx).valueToKey(key);
-        QString file_name = collector_dir + "/" + time_frame_str + "/" + instrument + "/" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss_zzz") + ".bar";
+        QString file_name = collector_dir + "/" + instrument + "/" + time_frame_str + "/" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss_zzz") + ".bar";
         QFile barFile(file_name);
         barFile.open(QFile::WriteOnly);
         QDataStream wstream(&barFile);
