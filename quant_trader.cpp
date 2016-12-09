@@ -345,8 +345,8 @@ AbstractIndicator* QuantTrader::registerIndicator(const QString &instrumentID, c
 
     qDebug() << params;
 
-    foreach (AbstractIndicator *indicator, indicator_map.values("instrument")) {
-        QObject *obj = (QObject*) indicator;
+    foreach (AbstractIndicator *indicator, indicator_map.values(instrumentID)) {
+        QObject *obj = dynamic_cast<QObject*>(indicator);
         if (indicator_name == obj->metaObject()->className()) {
             int count = obj->metaObject()->propertyCount();
             bool match = true;
@@ -359,7 +359,7 @@ AbstractIndicator* QuantTrader::registerIndicator(const QString &instrumentID, c
                 }
             }
             if (match) {
-                return (AbstractIndicator*)obj;
+                return indicator;
             }
         }
     }
@@ -376,15 +376,15 @@ AbstractIndicator* QuantTrader::registerIndicator(const QString &instrumentID, c
     for (int i = 0; i < parameter_number; i++) {
         int typeId = params[i].userType();
         switch (typeId) {
-        case QVariant::Int:
+        case QMetaType::Int:
             int_param[int_idx] = params[i].toInt();
             args.append(Q_ENUM_ARG(types[i].constData(), int_param[int_idx]));
             int_idx ++;
             break;
-        case QVariant::Double:
+        case QMetaType::Double:
             double_param[double_idx] = params[i].toDouble();
-            args.append(Q_ARG(double, params[i].toDouble()));
-            double_idx++;
+            args.append(Q_ARG(double, double_param[double_idx]));
+            double_idx ++;
             break;
         default:
             args.append(QGenericArgument());
