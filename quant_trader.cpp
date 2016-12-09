@@ -366,9 +366,10 @@ AbstractIndicator* QuantTrader::registerIndicator(const QString &instrumentID, c
 
     QVector<QGenericArgument> args;
     args.reserve(10);
-    int* int_param = new int[10];
+
+    int int_param[10];
     int int_idx = 0;
-    double * double_param = new double[10];
+    double double_param[10];
     int double_idx = 0;
 
 #define Q_ENUM_ARG(type, data) QArgument<int >(type, data)
@@ -397,18 +398,17 @@ AbstractIndicator* QuantTrader::registerIndicator(const QString &instrumentID, c
         qDebug() << arg.name();
     }
 
-    AbstractIndicator* ret = (AbstractIndicator*)
+    QObject * obj =
     metaObject->newInstance(args.value(0), args.value(1), args.value(2),
                             args.value(3), args.value(4), args.value(5),
                             args.value(6), args.value(7), args.value(8), args.value(9));
 
-    delete int_param;
-    delete double_param;
-
-    if (ret == 0) {
+    if (obj == 0) {
         qDebug() << "newInstance returns 0!";
-        return 0;
+        return nullptr;
     }
+
+    AbstractIndicator* ret = dynamic_cast<AbstractIndicator*>(obj);
 
     indicator_map.insert(instrumentID, ret);
     ((MQL5Indicator*)ret)->OnInit();
