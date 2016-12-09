@@ -3,11 +3,11 @@
 
 #include "mql5_indicator.h"
 
-class MA : public QObject, public MQL5IndicatorOnSingleDataBuffer
+class MA : public MQL5IndicatorOnSingleDataBuffer
 {
     Q_OBJECT
     Q_CLASSINFO("parameter_number", "4")
-    Q_PROPERTY(int MAPeroid READ getMAPeroid CONSTANT)
+    Q_PROPERTY(int MAPeriod READ getMAPeriod CONSTANT)
     Q_PROPERTY(int MAShift READ getMAShift CONSTANT)
     Q_PROPERTY(ENUM_MA_METHOD MAMethod READ getMAMethod CONSTANT)
     Q_ENUMS(ENUM_MA_METHOD)
@@ -19,12 +19,12 @@ public:
         MODE_LWMA,  // Linear-weighted averaging
     };
 
-    Q_INVOKABLE explicit MA(int period, int shift, ENUM_MA_METHOD ma_method, ENUM_APPLIED_PRICE applied_price = PRICE_CLOSE, QObject *parent = 0);
+    Q_INVOKABLE explicit MA(int MAPeriod, int MAShift, ENUM_MA_METHOD MAMethod, ENUM_APPLIED_PRICE applyTo = PRICE_CLOSE, QObject *parent = 0);
     ~MA() {}
 
     void OnInit() override;
 
-    int getMAPeroid() const { return InpMAPeriod; }
+    int getMAPeriod() const { return InpMAPeriod; }
     int getMAShift() const { return InpMAShift; }
     ENUM_MA_METHOD getMAMethod() const { return InpMAMethod; }
 

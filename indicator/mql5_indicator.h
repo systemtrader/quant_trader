@@ -169,9 +169,10 @@ protected:
 
 typedef double (* SIMPLIFY_PRICE)(double, double, double, double);
 
-class MQL5IndicatorOnSingleDataBuffer : public MQL5Indicator {
-    Q_GADGET
+class MQL5IndicatorOnSingleDataBuffer : public QObject, public MQL5Indicator {
+    Q_OBJECT
     Q_ENUMS(ENUM_APPLIED_PRICE)
+    Q_PROPERTY(ENUM_APPLIED_PRICE applyTo READ getAppliedTo CONSTANT)
 public:
     enum ENUM_APPLIED_PRICE {
         PRICE_CLOSE,    // Close price
@@ -183,11 +184,13 @@ public:
         PRICE_WEIGHTED, // Average price, (high + low + close + close)/4
     };
 
-    explicit MQL5IndicatorOnSingleDataBuffer(int indicator_buffers, ENUM_APPLIED_PRICE applied_price);
+    explicit MQL5IndicatorOnSingleDataBuffer(int indicator_buffers, ENUM_APPLIED_PRICE applyTo, QObject *parent = 0);
     ~MQL5IndicatorOnSingleDataBuffer() {}
 
+    ENUM_APPLIED_PRICE getAppliedTo() const { return applied; }
+
 protected:
-    const ENUM_APPLIED_PRICE applied_price;
+    const ENUM_APPLIED_PRICE applied;
     SIMPLIFY_PRICE simplify_func;
     IndicatorBuffer<double> applied_price_buffer;
 

@@ -16,6 +16,9 @@ int APPLIED_PRICE_enumIdx;
 QuantTrader::QuantTrader(QObject *parent) :
     QObject(parent)
 {
+    qRegisterMetaType<int>("ENUM_MA_METHOD");
+    qRegisterMetaType<int>("ENUM_APPLIED_PRICE");
+
     QuantTrader::instance = this;
 
     barCollector_enumIdx = BarCollector::staticMetaObject.indexOfEnumerator("TimeFrame");
@@ -267,60 +270,144 @@ QuantTrader::~QuantTrader()
     qDebug() << "~QuantTrader";
 }
 
+static QVariant getParam(const QByteArray &typeName, va_list &ap)
+{
+    QVariant ret;
+    int typeId = QMetaType::type(typeName);
+    switch (typeId) {
+    case QMetaType::Int:
+    {
+        int value = va_arg(ap, int);
+        ret.setValue(value);
+    }
+        break;
+    case QMetaType::Double:
+    {
+        double value = va_arg(ap, double);
+        ret.setValue(value);
+    }
+        break;
+    default:
+        break;
+    }
+    return ret;
+}
+
+static bool compareValue(const QVariant &v1, const QVariant &v2)
+{
+    int typeId = v1.userType();
+    if (typeId != v2.userType()) {
+        return false;
+    }
+    switch (typeId) {
+    case QMetaType::Int:
+        return v1.toInt() == v1.toInt();
+    case QMetaType::Double:
+        return v1.toDouble() == v2.toDouble();
+    default:
+        break;
+    }
+    return false;
+}
+
 AbstractIndicator* QuantTrader::registerIndicator(const QString &instrumentID, const QString &time_frame_str, QString indicator_name, ...)
 {
-    AbstractIndicator* ret = nullptr;
+    static QMap<QString, const QMetaObject*> meta_object_map;
+    meta_object_map.insert("MA", &MA::staticMetaObject);
+    meta_object_map.insert("ParabolicSAR", &ParabolicSAR::staticMetaObject);
+    // Register more indicators here
+
+    const QMetaObject * metaObject = meta_object_map.value(indicator_name, nullptr);
+    if (metaObject == nullptr) {
+        qDebug() << "Indicator " << indicator_name << " not exist!";
+        return nullptr;
+    }
+
+    const int class_info_count = metaObject->classInfoCount();
+    int parameter_number = 0;
+    for (int i = 0; i < class_info_count; i++) {
+        QMetaClassInfo classInfo = metaObject->classInfo(i);
+        if (QString(classInfo.name()).compare("parameter_number", Qt::CaseInsensitive) == 0) {
+            parameter_number = QString(classInfo.value()).toInt();
+            qDebug() << parameter_number;
+        }
+    }
+
     va_list ap;
     va_start(ap, indicator_name);
 
-    bool newCreate = false;
-    if (indicator_name == "MA") {
-        int period = va_arg(ap, int);
-        int shift = va_arg(ap, int);
-        int ma_method = va_arg(ap, int);
-        int applied_price = va_arg(ap, int);
-
-        foreach (AbstractIndicator *indicator, indicator_map.values("instrument")) {
-            QObject *obj = (QObject*) indicator;
-            if (QString("MA") == obj->metaObject()->className()) {
-                MA *ma = (MA*) indicator;
-                if (ma->getMAPeroid() == period && ma->getMAShift() == shift && ma->getMAMethod() == ma_method) {
-                    ret = indicator;
-                    break;
-                }
-            }
-        }
-        if (ret == nullptr) {
-            ret = new MA(period, shift, static_cast<MA::ENUM_MA_METHOD>(ma_method), static_cast<MQL5IndicatorOnSingleDataBuffer::ENUM_APPLIED_PRICE>(applied_price), QuantTrader::instance);
-            newCreate = true;
-        }
-    } else if (indicator_name == "ParabolicSAR") {
-        double SARStep = va_arg(ap, double);
-        double SARMaximum = va_arg(ap, double);
-
-        foreach (AbstractIndicator *indicator, indicator_map.values("instrument")) {
-            QObject *obj = (QObject*) indicator;
-            if (QString("ParabolicSAR") == obj->metaObject()->className()) {
-                ParabolicSAR *psar = (ParabolicSAR*) indicator;
-                if (psar->getSARStep() == SARStep && psar->getSARMaximum() == SARMaximum) {
-                    ret = indicator;
-                    break;
-                }
-            }
-        }
-        if (ret == nullptr) {
-            ret = new ParabolicSAR(SARStep, SARMaximum, QuantTrader::instance);
-            newCreate = true;
-        }
+    auto names = metaObject->constructor(0).parameterNames();
+    auto types = metaObject->constructor(0).parameterTypes();
+    QList<QVariant> params;
+    for (int i = 0; i < parameter_number; i++) {
+        params.append(getParam(types[i], ap));
     }
     va_end(ap);
 
-    if (newCreate) {
-        indicator_map.insert(instrumentID, ret);
-        ((MQL5Indicator*)ret)->OnInit();
-        ret->setBarList(getBars(instrumentID, time_frame_str), collector_map[instrumentID]->getCurrentBar(time_frame_str));
-        ret->update();
+    qDebug() << params;
+
+    foreach (AbstractIndicator *indicator, indicator_map.values(instrumentID)) {
+        QObject *obj = dynamic_cast<QObject*>(indicator);
+        if (indicator_name == obj->metaObject()->className()) {
+            bool match = true;
+            for (int i = 0; i < parameter_number; i++) {
+                QVariant value = obj->property(names[i]);
+                if (!compareValue(params[i], value)) {
+                    match = false;
+                }
+            }
+            if (match) {
+                return indicator;
+            }
+        }
     }
+
+    QVector<QGenericArgument> args;
+    args.reserve(10);
+
+    int int_param[10];
+    int int_idx = 0;
+    double double_param[10];
+    int double_idx = 0;
+
+#define Q_ENUM_ARG(type, data) QArgument<int >(type, data)
+
+    for (int i = 0; i < parameter_number; i++) {
+        int typeId = params[i].userType();
+        switch (typeId) {
+        case QMetaType::Int:
+            int_param[int_idx] = params[i].toInt();
+            args.append(Q_ENUM_ARG(types[i].constData(), int_param[int_idx]));
+            int_idx ++;
+            break;
+        case QMetaType::Double:
+            double_param[double_idx] = params[i].toDouble();
+            args.append(Q_ARG(double, double_param[double_idx]));
+            double_idx ++;
+            break;
+        default:
+            args.append(QGenericArgument());
+            break;
+        }
+    }
+    args.append(Q_ARG(QObject*, this));
+
+    QObject * obj =
+    metaObject->newInstance(args.value(0), args.value(1), args.value(2),
+                            args.value(3), args.value(4), args.value(5),
+                            args.value(6), args.value(7), args.value(8), args.value(9));
+
+    if (obj == 0) {
+        qDebug() << "newInstance returns 0!";
+        return nullptr;
+    }
+
+    AbstractIndicator* ret = dynamic_cast<AbstractIndicator*>(obj);
+
+    indicator_map.insert(instrumentID, ret);
+    ((MQL5Indicator*)ret)->OnInit();
+    ret->setBarList(getBars(instrumentID, time_frame_str), collector_map[instrumentID]->getCurrentBar(time_frame_str));
+    ret->update();
 
     return ret;
 }

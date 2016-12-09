@@ -7,11 +7,11 @@ class ParabolicSAR : public QObject, public MQL5Indicator
 {
     Q_OBJECT
     Q_CLASSINFO("parameter_number", "2")
-    Q_PROPERTY(double SARStep READ getSARStep)
-    Q_PROPERTY(double SARMaximum READ getSARMaximum)
+    Q_PROPERTY(double SARStep READ getSARStep CONSTANT)
+    Q_PROPERTY(double SARMaximum READ getSARMaximum CONSTANT)
 
 public:
-    Q_INVOKABLE explicit ParabolicSAR(double step = 0.02, double maximum = 0.2, QObject *parent = 0);
+    Q_INVOKABLE explicit ParabolicSAR(double SARStep = 0.02, double SARMaximum = 0.2, QObject *parent = 0);
     ~ParabolicSAR() {}
 
     void OnInit() override;
