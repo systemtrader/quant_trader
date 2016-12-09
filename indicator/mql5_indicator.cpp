@@ -102,11 +102,12 @@ void MQL5Indicator::preCalculate()
     }
 }
 
-MQL5IndicatorOnSingleDataBuffer::MQL5IndicatorOnSingleDataBuffer(int indicator_buffers, ENUM_APPLIED_PRICE applied_price) :
+MQL5IndicatorOnSingleDataBuffer::MQL5IndicatorOnSingleDataBuffer(int indicator_buffers, ENUM_APPLIED_PRICE applyTo, QObject *parent) :
+    QObject(parent),
     MQL5Indicator(indicator_buffers),
-    applied_price(applied_price)
+    applied(applyTo)
 {
-    switch (applied_price) {
+    switch (applied) {
     case PRICE_OPEN:
         simplify_func = price_open;
         break;

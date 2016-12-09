@@ -336,6 +336,7 @@ AbstractIndicator* QuantTrader::registerIndicator(const QString &instrumentID, c
     va_list ap;
     va_start(ap, indicator_name);
 
+    auto names = metaObject->constructor(0).parameterNames();
     auto types = metaObject->constructor(0).parameterTypes();
     QList<QVariant> params;
     for (int i = 0; i < parameter_number; i++) {
@@ -348,12 +349,9 @@ AbstractIndicator* QuantTrader::registerIndicator(const QString &instrumentID, c
     foreach (AbstractIndicator *indicator, indicator_map.values(instrumentID)) {
         QObject *obj = dynamic_cast<QObject*>(indicator);
         if (indicator_name == obj->metaObject()->className()) {
-            int count = obj->metaObject()->propertyCount();
             bool match = true;
-            for (int i = 0; i < count; i++) {
-                QMetaProperty metaproperty = metaObject->property(i);
-                const char *name = metaproperty.name();
-                QVariant value = obj->property(name);
+            for (int i = 0; i < parameter_number; i++) {
+                QVariant value = obj->property(names[i]);
                 if (!compareValue(params[i], value)) {
                     match = false;
                 }
@@ -393,10 +391,6 @@ AbstractIndicator* QuantTrader::registerIndicator(const QString &instrumentID, c
         }
     }
     args.append(Q_ARG(QObject*, this));
-
-    foreach (const auto& arg, args) {
-        qDebug() << arg.name();
-    }
 
     QObject * obj =
     metaObject->newInstance(args.value(0), args.value(1), args.value(2),
