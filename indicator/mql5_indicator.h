@@ -113,7 +113,6 @@ class Bar;
 
 class MQL5Indicator : public AbstractIndicator
 {
-    Q_GADGET
 public:
     explicit MQL5Indicator(int indicator_buffers);
     ~MQL5Indicator();
@@ -171,8 +170,8 @@ typedef double (* SIMPLIFY_PRICE)(double, double, double, double);
 
 class MQL5IndicatorOnSingleDataBuffer : public QObject, public MQL5Indicator {
     Q_OBJECT
-    Q_ENUMS(ENUM_APPLIED_PRICE)
     Q_PROPERTY(ENUM_APPLIED_PRICE applyTo READ getAppliedTo CONSTANT)
+    Q_ENUMS(ENUM_APPLIED_PRICE)
 public:
     enum ENUM_APPLIED_PRICE {
         PRICE_CLOSE,    // Close price

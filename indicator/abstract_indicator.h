@@ -1,13 +1,11 @@
 #ifndef ABSTRACT_INDICATOR_H
 #define ABSTRACT_INDICATOR_H
 
-#include <QObject>
-
+template <typename T> class QList;
 class Bar;
 
 class AbstractIndicator
 {
-    Q_GADGET
 protected:
     QList<Bar> *barList;
     Bar *lastBar;

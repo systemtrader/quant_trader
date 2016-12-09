@@ -64,9 +64,12 @@ void QuantTrader::loadQuantTraderSettings()
 
 void QuantTrader::loadTradeStrategySettings()
 {
-    static QMap<QString, const QMetaObject*> meta_object_map;
-    meta_object_map.insert("DblMaPsarStrategy", &DblMaPsarStrategy::staticMetaObject);
-    // Register more strategies here
+    static const auto meta_object_map = []() -> QMap<QString, const QMetaObject*> {
+        QMap<QString, const QMetaObject*> map;
+        map.insert("DblMaPsarStrategy", &DblMaPsarStrategy::staticMetaObject);
+        // Register more strategies here
+        return map;
+    }();
 
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "ctp", "trade_strategy");
     QStringList groups = settings.childGroups();
@@ -97,7 +100,7 @@ void QuantTrader::loadTradeStrategySettings()
             continue;
         }
 
-        AbstractStrategy *strategy = qobject_cast<AbstractStrategy*>(object);
+        auto *strategy = qobject_cast<AbstractStrategy*>(object);
         if (strategy == NULL) {
             qDebug() << "Cast strategy " << group << " failed!";
             delete object;
@@ -312,10 +315,13 @@ static bool compareValue(const QVariant &v1, const QVariant &v2)
 
 AbstractIndicator* QuantTrader::registerIndicator(const QString &instrumentID, const QString &time_frame_str, QString indicator_name, ...)
 {
-    static QMap<QString, const QMetaObject*> meta_object_map;
-    meta_object_map.insert("MA", &MA::staticMetaObject);
-    meta_object_map.insert("ParabolicSAR", &ParabolicSAR::staticMetaObject);
-    // Register more indicators here
+    static const auto meta_object_map = []() -> QMap<QString, const QMetaObject*> {
+        QMap<QString, const QMetaObject*> map;
+        map.insert("MA", &MA::staticMetaObject);
+        map.insert("ParabolicSAR", &ParabolicSAR::staticMetaObject);
+        // Register more indicators here
+        return map;
+    }();
 
     const QMetaObject * metaObject = meta_object_map.value(indicator_name, nullptr);
     if (metaObject == nullptr) {
@@ -402,10 +408,9 @@ AbstractIndicator* QuantTrader::registerIndicator(const QString &instrumentID, c
         return nullptr;
     }
 
-    AbstractIndicator* ret = dynamic_cast<AbstractIndicator*>(obj);
+    auto* ret = dynamic_cast<AbstractIndicator*>(obj);
 
     indicator_map.insert(instrumentID, ret);
-    ((MQL5Indicator*)ret)->OnInit();
     ret->setBarList(getBars(instrumentID, time_frame_str), collector_map[instrumentID]->getCurrentBar(time_frame_str));
     ret->update();
 

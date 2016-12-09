@@ -59,6 +59,8 @@ void MQL5Indicator::setBarList(QList<Bar> *list, Bar *last)
 {
     AbstractIndicator::setBarList(list, last);
 
+    OnInit();
+
     time = new RemapListMember<Bar, uint>(list, &Bar::time, last);
     open = new RemapListMember<Bar, double>(list, &Bar::open, last);
     high = new RemapListMember<Bar, double>(list, &Bar::high, last);

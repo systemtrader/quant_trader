@@ -73,16 +73,14 @@ void BarCollector::saveBars()
 #define MIN_UNIT    60
 #define HOUR_UNIT   3600
 
-QMap<BarCollector::TimeFrame, int> createTimeTable() {
+static const auto g_time_table = []() -> QMap<BarCollector::TimeFrame, int> {
     QMap<BarCollector::TimeFrame, int> timeTable;
     timeTable.insert(BarCollector::MIN1, 1 * MIN_UNIT);
     timeTable.insert(BarCollector::MIN5, 5 * MIN_UNIT);
     timeTable.insert(BarCollector::MIN15, 15 * MIN_UNIT);
     timeTable.insert(BarCollector::MIN60, 1 * HOUR_UNIT);
     return timeTable;
-}
-
-const QMap<BarCollector::TimeFrame, int> g_time_table = createTimeTable();
+}();
 
 void BarCollector::onNewTick(int volume, double turnover, double openInterest, uint time, double lastPrice)
 {
