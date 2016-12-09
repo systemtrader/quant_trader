@@ -1,10 +1,12 @@
 #ifndef QUANT_TRADER_H
 #define QUANT_TRADER_H
 
-#include <QMultiMap>
-
 #include "market_watcher_interface.h"
 #include "ctp_executer_interface.h"
+
+template <typename T> class QList;
+template <typename Key, typename T> class QMap;
+template <typename Key, typename T> class QMultiMap;
 
 class Bar;
 class BarCollector;

@@ -1,3 +1,4 @@
+#include <QMultiMap>
 #include <QSettings>
 
 #include "quant_trader.h"

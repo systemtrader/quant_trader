@@ -31,14 +31,25 @@ public:
     double volume;
 
     Bar() { init(); }
-    Bar(const KTExportBar &ktbar) :
-        time(ktbar.m_time),
-        tick_volume(0),
-        open(ktbar.m_fOpen),
-        high(ktbar.m_fHigh),
-        low(ktbar.m_fLow),
-        close(ktbar.m_fClose),
-        volume(ktbar.m_fVolume) {
+
+    Bar(const Bar &other) {
+        time = other.time;
+        tick_volume = other.tick_volume;
+        open = other.open;
+        high = other.high;
+        low = other.low;
+        close = other.close;
+        volume = other.volume;
+    }
+
+    Bar(const KTExportBar &ktbar) {
+        time = ktbar.m_time;
+        tick_volume = 0;
+        open = ktbar.m_fOpen;
+        high = ktbar.m_fHigh;
+        low = ktbar.m_fLow;
+        close = ktbar.m_fClose;
+        volume = ktbar.m_fVolume;
     }
 
     void init() {
@@ -56,7 +67,7 @@ public:
     }
 };
 
-Q_DECLARE_METATYPE(Bar);
+Q_DECLARE_METATYPE(Bar)
 
 #endif // BAR_H
 
