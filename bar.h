@@ -24,12 +24,12 @@ struct KTExportBar {
 class Bar {
 public:
     uint   time;
-    long   tick_volume; // to be compatible with MT5(although MT5 use 64bit long), and also for memory alignment
     double open;
     double high;
     double low;
     double close;
-    double volume;
+    long   tick_volume; // to be compatible with MT5(although MT5 use 64bit long)
+    long   volume;      // to be compatible with MT5(although MT5 use 64bit long)
 
     Bar();
     Bar(const Bar &other);

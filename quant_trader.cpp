@@ -139,12 +139,12 @@ static QDataStream& operator>>(QDataStream& s, KTExportBar& bar)
 static QDataStream& operator>>(QDataStream& s, Bar& bar)
 {
     s >> bar.time;
-    s >> (qint32&)bar.tick_volume;
     s >> bar.open;
     s >> bar.high;
     s >> bar.low;
     s >> bar.close;
-    s >> bar.volume;
+    s >> (qint32&)bar.tick_volume;
+    s >> (qint32&)bar.volume;
     return s;
 }
 
@@ -251,6 +251,9 @@ QList<Bar>* QuantTrader::getBars(const QString &instrumentID, const QString &tim
     // load Collector Bars
     const QString collector_bar_path = BarCollector::collector_dir + "/" + instrumentID + "/" + time_frame_str;
     QDir collector_bar_dir(collector_bar_path);
+    QStringList filters;
+    filters << "*.bars";
+    collector_bar_dir.setNameFilters(filters);
     QStringList entries = collector_bar_dir.entryList(QDir::Files | QDir::NoDotAndDotDot, QDir::Name);
     foreach (const QString &barfilename, entries) {
         QFile barfile(barfilename);

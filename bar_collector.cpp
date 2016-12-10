@@ -14,11 +14,11 @@ QString BarCollector::collector_dir;
 static QDataStream& operator<<(QDataStream& s, const Bar& bar)
 {
     s << bar.time;
-    s << (qint32)bar.tick_volume;
     s << bar.open;
     s << bar.high;
     s << bar.low;
     s << bar.close;
+    s << bar.tick_volume;
     s << bar.volume;
     return s;
 }
@@ -67,21 +67,6 @@ Bar* BarCollector::getCurrentBar(const QString &time_frame_str)
     return &current_bar_map[time_frame];
 }
 
-void BarCollector::saveBars()
-{
-    foreach (const auto key, keys) {
-        auto & barList = bar_list_map[key];
-        QString time_frame_str = BarCollector::staticMetaObject.enumerator(barCollector_enumIdx).valueToKey(key);
-        QString file_name = collector_dir + "/" + instrument + "/" + time_frame_str + "/" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss_zzz") + ".bar";
-        QFile barFile(file_name);
-        barFile.open(QFile::WriteOnly);
-        QDataStream wstream(&barFile);
-        wstream.setFloatingPointPrecision(QDataStream::DoublePrecision);
-        wstream << barList;
-        barList.clear();
-    }
-}
-
 #define MIN_UNIT    60
 #define HOUR_UNIT   3600
 
@@ -125,5 +110,21 @@ void BarCollector::onNewTick(int volume, double turnover, double openInterest, u
 
         bar.close = lastPrice;
         bar.tick_volume ++;
+    }
+}
+
+void BarCollector::saveBars()
+{
+    foreach (const auto key, keys) {
+        auto & barList = bar_list_map[key];
+        QString time_frame_str = BarCollector::staticMetaObject.enumerator(barCollector_enumIdx).valueToKey(key);
+        QString file_name = collector_dir + "/" + instrument + "/" + time_frame_str + "/" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss_zzz") + ".bars";
+        QFile barFile(file_name);
+        barFile.open(QFile::WriteOnly);
+        QDataStream wstream(&barFile);
+        wstream.setFloatingPointPrecision(QDataStream::DoublePrecision);
+        wstream << barList;
+        barFile.close();
+        barList.clear();
     }
 }

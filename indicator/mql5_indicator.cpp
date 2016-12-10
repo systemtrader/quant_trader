@@ -69,7 +69,7 @@ void MQL5Indicator::setBarList(QList<Bar> *list, Bar *last)
 
     // tick_volume, volume and spread are not implemented yet, don't use them in indicators
     tick_volume = new RemapListMember<Bar, long>(list, &Bar::tick_volume, last);
-    volume = nullptr;
+    volume = new RemapListMember<Bar, long>(list, &Bar::volume, last);
     spread = nullptr;
 
     remaped = true;

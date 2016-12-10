@@ -35,12 +35,11 @@ protected:
     QMap<TimeFrame, QList<Bar>> bar_list_map;
     QMap<TimeFrame, Bar> current_bar_map;
 
-    void saveBars();
-
 signals:
     void collectedBar(const QString& instrumentID, int time_frame, const Bar& bar);
 public slots:
     void onNewTick(int volume, double turnover, double openInterest, uint time, double lastPrice);
+    void saveBars();
 };
 
 #endif // BAR_COLLECTOR_H
