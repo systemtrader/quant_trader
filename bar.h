@@ -38,11 +38,14 @@ public:
     Bar(const KTExportBar &ktbar);
 
     void init();
-    bool isNewBar();
+    bool isNewBar() const;
 };
 
 Q_DECLARE_METATYPE(Bar)
 
+QDataStream& operator>>(QDataStream& s, KTExportBar& bar);
+QDataStream& operator>>(QDataStream& s, Bar& bar);
+QDataStream& operator<<(QDataStream& s, const Bar& bar);
 QDebug operator<<(QDebug dbg, const Bar &bar);
 
 #endif // BAR_H

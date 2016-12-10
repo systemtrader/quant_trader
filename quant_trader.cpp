@@ -120,34 +120,6 @@ void QuantTrader::loadTradeStrategySettings()
     }
 }
 
-static QDataStream& operator>>(QDataStream& s, KTExportBar& bar)
-{
-    s >> bar.m_time;
-    s >> bar.m_fOpen;
-    s >> bar.m_fHigh;
-    s >> bar.m_fLow;
-    s >> bar.m_fClose;
-    s >> bar.m_fVolume;
-    s >> bar.m_fAmount;
-    s >> bar.m_wAdvance;
-    s >> bar.m_wDecline;
-    s >> bar.amount;
-    s >> bar.settle;
-    return s;
-}
-
-static QDataStream& operator>>(QDataStream& s, Bar& bar)
-{
-    s >> bar.time;
-    s >> bar.open;
-    s >> bar.high;
-    s >> bar.low;
-    s >> bar.close;
-    s >> bar.tick_volume;
-    s >> bar.volume;
-    return s;
-}
-
 /* 以下这段代码包括getSuffix函数是从Java移植过来的, 写成这样是为了尽量维持与VC++2010和c++11的兼容性 */
 /* 如果不考虑兼容VC++2010, 可直接使用Range-based for loop */
 

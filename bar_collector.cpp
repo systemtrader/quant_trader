@@ -11,18 +11,6 @@
 extern int barCollector_enumIdx;
 QString BarCollector::collector_dir;
 
-static QDataStream& operator<<(QDataStream& s, const Bar& bar)
-{
-    s << bar.time;
-    s << bar.open;
-    s << bar.high;
-    s << bar.low;
-    s << bar.close;
-    s << bar.tick_volume;
-    s << bar.volume;
-    return s;
-}
-
 BarCollector::BarCollector(const QString& instrumentID, const TimeFrames &time_frame_flags, QObject *parent) :
     QObject(parent),
     instrument(instrumentID)

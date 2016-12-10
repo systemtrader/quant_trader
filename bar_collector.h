@@ -27,7 +27,7 @@ public:
     ~BarCollector();
 
     static QString collector_dir;
-    Bar* getCurrentBar(const QString &time_frame_str);
+    Bar *getCurrentBar(const QString &time_frame_str);
 
 protected:
     const QString instrument;

@@ -28,7 +28,7 @@ AbstractStrategy::~AbstractStrategy()
     delete result;
 }
 
-inline bool AbstractStrategy::isNewBar()
+inline bool AbstractStrategy::isNewBar() const
 {
     return lastBar->tick_volume == 1;
 }

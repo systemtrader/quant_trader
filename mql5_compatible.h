@@ -76,7 +76,7 @@ public:
         is_time_series = is_series;
     }
 
-    bool getAsSeries() {
+    bool getAsSeries() const {
         return is_time_series;
     }
 

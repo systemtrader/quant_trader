@@ -24,7 +24,7 @@ protected:
     double tp_price;
     double sl_price;
 
-    bool isNewBar();
+    bool isNewBar() const;
     void resetPosition();
     void saveResult();
 
@@ -32,7 +32,7 @@ public:
     explicit AbstractStrategy(const QString& id, const QString& instrumentID, const QString& time_frame, QObject *parent = 0);
     ~AbstractStrategy();
 
-    int getPosition() {
+    int getPosition() const {
         return position;
     }
 
