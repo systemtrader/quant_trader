@@ -59,8 +59,8 @@ int ParabolicSAR::OnCalculate (const int rates_total,                     // siz
                                const _TimeSeries<double>& high,           // High
                                const _TimeSeries<double>& low,            // Low
                                const _TimeSeries<double>& close,          // Close
-                               const _TimeSeries<long>& tick_volume,      // Tick Volume
-                               const _TimeSeries<long>& volume,           // Real Volume
+                               const _TimeSeries<qint64>& tick_volume,      // Tick Volume
+                               const _TimeSeries<qint64>& volume,           // Real Volume
                                const _TimeSeries<int>& spread             // Spread
                                )
   {

@@ -137,8 +137,8 @@ protected:
     _TimeSeries<double> *high;
     _TimeSeries<double> *low;
     _TimeSeries<double> *close;
-    _TimeSeries<long> *tick_volume;
-    _TimeSeries<long> *volume;
+    _TimeSeries<qint64> *tick_volume;
+    _TimeSeries<qint64> *volume;
     _TimeSeries<int> *spread;
 
     void setBarList(QList<Bar> *list, Bar *last) override;
@@ -160,8 +160,8 @@ protected:
                      const _TimeSeries<double>& high,           // High
                      const _TimeSeries<double>& low,            // Low
                      const _TimeSeries<double>& close,          // Close
-                     const _TimeSeries<long>& tick_volume,      // Tick Volume
-                     const _TimeSeries<long>& volume,           // Real Volume
+                     const _TimeSeries<qint64>& tick_volume,    // Tick Volume
+                     const _TimeSeries<qint64>& volume,         // Real Volume
                      const _TimeSeries<int>& spread             // Spread
                      ) = 0;
 };
@@ -201,8 +201,8 @@ protected:
                      const _TimeSeries<double>& high,           // High
                      const _TimeSeries<double>& low,            // Low
                      const _TimeSeries<double>& close,          // Close
-                     const _TimeSeries<long>& tick_volume,      // Tick Volume
-                     const _TimeSeries<long>& volume,           // Real Volume
+                     const _TimeSeries<qint64>& tick_volume,    // Tick Volume
+                     const _TimeSeries<qint64>& volume,         // Real Volume
                      const _TimeSeries<int>& spread             // Spread
                      ) override;
 

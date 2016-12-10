@@ -28,8 +28,8 @@ public:
     double high;
     double low;
     double close;
-    long   tick_volume; // to be compatible with MT5(although MT5 use 64bit long)
-    long   volume;      // to be compatible with MT5(although MT5 use 64bit long)
+    qint64 tick_volume; // compatible with MT5
+    qint64 volume;      // compatible with MT5
 
     Bar();
     Bar(const Bar &other);

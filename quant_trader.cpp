@@ -143,8 +143,8 @@ static QDataStream& operator>>(QDataStream& s, Bar& bar)
     s >> bar.high;
     s >> bar.low;
     s >> bar.close;
-    s >> (qint32&)bar.tick_volume;
-    s >> (qint32&)bar.volume;
+    s >> bar.tick_volume;
+    s >> bar.volume;
     return s;
 }
 

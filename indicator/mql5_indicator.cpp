@@ -68,8 +68,8 @@ void MQL5Indicator::setBarList(QList<Bar> *list, Bar *last)
     close = new RemapListMember<Bar, double>(list, &Bar::close, last);
 
     // tick_volume, volume and spread are not implemented yet, don't use them in indicators
-    tick_volume = new RemapListMember<Bar, long>(list, &Bar::tick_volume, last);
-    volume = new RemapListMember<Bar, long>(list, &Bar::volume, last);
+    tick_volume = new RemapListMember<Bar, qint64>(list, &Bar::tick_volume, last);
+    volume = new RemapListMember<Bar, qint64>(list, &Bar::volume, last);
     spread = nullptr;
 
     remaped = true;
@@ -150,8 +150,8 @@ int MQL5IndicatorOnSingleDataBuffer::OnCalculate(const int rates_total,         
                                                  const _TimeSeries<double>& high,           // High
                                                  const _TimeSeries<double>& low,            // Low
                                                  const _TimeSeries<double>& close,          // Close
-                                                 const _TimeSeries<long>& tick_volume,      // Tick Volume
-                                                 const _TimeSeries<long>& volume,           // Real Volume
+                                                 const _TimeSeries<qint64>& tick_volume,      // Tick Volume
+                                                 const _TimeSeries<qint64>& volume,           // Real Volume
                                                  const _TimeSeries<int>& spread             // Spread
                                                  )
 {
