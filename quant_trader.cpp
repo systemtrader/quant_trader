@@ -38,6 +38,11 @@ void QuantTrader::loadQuantTraderSettings()
 {
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "ctp", "quant_trader");
 
+    settings.beginGroup("HistoryPath");
+    kt_export_dir = settings.value("ktexport").toString();
+    BarCollector::collector_dir = settings.value("collector").toString();
+    settings.endGroup();
+
     settings.beginGroup("Collector");
     QStringList instrumentList = settings.childKeys();
 
@@ -55,11 +60,6 @@ void QuantTrader::loadQuantTraderSettings()
         collector_map[instrument] = collector;
         qDebug() << instrument << ":\t" << time_frame_flags << "\t" << time_frame_stringlist;
     }
-    settings.endGroup();
-
-    settings.beginGroup("HistoryPath");
-    kt_export_dir = settings.value("ktexport").toString();
-    BarCollector::collector_dir = settings.value("collector").toString();
     settings.endGroup();
 }
 

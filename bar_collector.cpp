@@ -3,6 +3,7 @@
 #include <QMetaEnum>
 #include <QDateTime>
 #include <QFile>
+#include <QDir>
 
 #include "bar.h"
 #include "bar_collector.h"
@@ -40,6 +41,17 @@ BarCollector::BarCollector(const QString& instrumentID, const TimeFrames &time_f
     foreach (const auto key, keys) {
         bar_list_map.insert(key, QList<Bar>());
         current_bar_map.insert(key, Bar());
+
+        // Check if the directory is already created for collected bars
+        QString time_frame_str = BarCollector::staticMetaObject.enumerator(barCollector_enumIdx).valueToKey(key);
+        QString path_for_this_key = collector_dir + "/" + instrument + "/" + time_frame_str;
+        QDir dir(path_for_this_key);
+        if (!dir.exists()) {
+            bool ret = dir.mkpath(path_for_this_key);
+            if (!ret) {
+                qDebug() << "Create directory failed!";
+            }
+        }
     }
 }
 
@@ -73,8 +85,8 @@ void BarCollector::saveBars()
 #define MIN_UNIT    60
 #define HOUR_UNIT   3600
 
-static const auto g_time_table = []() -> QMap<BarCollector::TimeFrame, int> {
-    QMap<BarCollector::TimeFrame, int> timeTable;
+static const auto g_time_table = []() -> QMap<BarCollector::TimeFrame, uint> {
+    QMap<BarCollector::TimeFrame, uint> timeTable;
     timeTable.insert(BarCollector::MIN1, 1 * MIN_UNIT);
     timeTable.insert(BarCollector::MIN5, 5 * MIN_UNIT);
     timeTable.insert(BarCollector::MIN15, 15 * MIN_UNIT);
@@ -86,19 +98,20 @@ void BarCollector::onNewTick(int volume, double turnover, double openInterest, u
 {
     foreach (const auto key, keys) {
         Bar & bar = current_bar_map[key];
-        const int time_unit = g_time_table[key];  // TODO optimize, use time_unit as key
+        const uint time_unit = g_time_table[key];  // TODO optimize, use time_unit as key
 
         if (bar.tick_volume > 0) {
-            if ((time / time_unit) > (bar.time / time_unit)) {
+            if ((time / time_unit) != (bar.time / time_unit)) {
                 bar_list_map[key].append(bar);
                 emit collectedBar(instrument, key, bar);
+                qDebug() << instrument << ": " << bar;
                 bar.init();
             }
         }
 
         if (bar.isNewBar()) {
             bar.open = lastPrice;
-            // TODO convert time value to time_t format
+            // TODO add data, save as time_t format
             bar.time = time / time_unit * time_unit;
         }
 
