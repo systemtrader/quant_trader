@@ -1,7 +1,6 @@
 #ifndef MQL5_COMPATIBLE_H
 #define MQL5_COMPATIBLE_H
 
-#include <algorithm>
 #include <cmath>
 
 #include <QString>
@@ -41,20 +40,20 @@ void Print(...) {}
 inline
 double MathMin(double x, double y)
 {
-#ifndef _MSC_VER
-    return fmin(x, y);
+#ifdef _MSC_VER
+    return qMin(x, y);
 #else
-    return std::min(x, y);
+    return fmin(x, y);
 #endif
 }
 
 inline
 double MathMax(double x, double y)
 {
-#ifndef _MSC_VER
-    return fmax(x, y);
+#ifdef _MSC_VER
+    return qMax(x, y);
 #else
-    return std::max(x, y);
+    return fmax(x, y);
 #endif
 }
 

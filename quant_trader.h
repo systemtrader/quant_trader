@@ -32,6 +32,9 @@ protected:
     void loadTradeStrategySettings();
     QList<Bar>* getBars(const QString &instrumentID, const QString &time_frame_str);
 
+    QTimer *saveBarTimer;
+    void resetSaveBarTimer();
+
 public:
     explicit QuantTrader(QObject *parent = 0);
     ~QuantTrader();

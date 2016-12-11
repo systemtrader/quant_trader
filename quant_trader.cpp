@@ -29,9 +29,21 @@ QuantTrader::QuantTrader(QObject *parent) :
     loadQuantTraderSettings();
     loadTradeStrategySettings();
 
+    saveBarTimer = new QTimer(this);
+    saveBarTimer->setSingleShot(true);
+    foreach (auto & collector, collector_map) {
+        connect(saveBarTimer, SIGNAL(timeout()), collector, SLOT(saveBars()));
+    }
+    resetSaveBarTimer();
+
     pExecuter = new org::ctp::ctp_executer("org.ctp.ctp_executer", "/ctp_executer", QDBusConnection::sessionBus(), this);
     pWatcher = new org::ctp::market_watcher("org.ctp.market_watcher", "/market_watcher", QDBusConnection::sessionBus(), this);
     connect(pWatcher, SIGNAL(newTick(int,double,double,uint,double,QString)), this, SLOT(onNewTick(int,double,double,uint,double,QString)));
+}
+
+QuantTrader::~QuantTrader()
+{
+    qDebug() << "~QuantTrader";
 }
 
 void QuantTrader::loadQuantTraderSettings()
@@ -244,11 +256,6 @@ QList<Bar>* QuantTrader::getBars(const QString &instrumentID, const QString &tim
     return barList;
 }
 
-QuantTrader::~QuantTrader()
-{
-    qDebug() << "~QuantTrader";
-}
-
 static QVariant getParam(const QByteArray &typeName, va_list &ap)
 {
     QVariant ret;
@@ -391,6 +398,29 @@ AbstractIndicator* QuantTrader::registerIndicator(const QString &instrumentID, c
     ret->update();
 
     return ret;
+}
+
+void QuantTrader::resetSaveBarTimer()
+{
+    static const auto time_points = []() -> QList<QTime> {
+        QList<QTime> tlist;
+        tlist << QTime(2, 32) << QTime(10, 17) << QTime(11, 32) << QTime(15, 2);
+        return tlist;
+    }();
+
+    qDebug() << time_points;
+    const int size = time_points.size();
+    int i;
+    for (i = 0; i < size; i++) {
+        int diff = time_points[i].msecsTo(QTime::currentTime());
+        if (diff > 1000) {
+            saveBarTimer->start(diff);
+        }
+    }
+    if (i == size) {
+        int diff = time_points[0].msecsTo(QTime::currentTime());
+        saveBarTimer->start(diff);
+    }
 }
 
 void QuantTrader::onNewTick(int volume, double turnover, double openInterest, uint time, double lastPrice, const QString &instrumentID)
