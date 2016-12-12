@@ -1,14 +1,14 @@
 #ifndef BAR_H
 #define BAR_H
 
-#include <QDebug>
 #include <QMetaType>
+#include <QDataStream>
+#include <QDebug>
 
-#define TimeType int
 typedef unsigned short      WORD;
 
 struct KTExportBar {
-    TimeType m_time;        //时间,UCT
+    int     m_time;         //时间,UTC
     float   m_fOpen;        //开盘
     float   m_fHigh;        //最高
     float   m_fLow;         //最低
