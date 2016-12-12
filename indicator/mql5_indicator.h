@@ -2,7 +2,7 @@
 #define MQL5_INDICATOR_H
 
 #include "abstract_indicator.h"
-#include "mql5_compatible.h"
+#include "../mql5_compatible.h"
 
 enum ENUM_INDEXBUFFER_TYPE {
     INDICATOR_DATA,

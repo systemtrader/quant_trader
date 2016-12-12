@@ -2,8 +2,8 @@
 #define DBLMAPSAR_STRATEGY_H
 
 #include "abstract_strategy.h"
-#include "indicator/ma.h"
-#include "indicator/parabolicsar.h"
+#include "../indicator/ma.h"
+#include "../indicator/parabolicsar.h"
 
 class DblMaPsarStrategy : public AbstractStrategy
 {

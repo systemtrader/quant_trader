@@ -3,9 +3,9 @@
 #include <QDateTime>
 #include <QDebug>
 
-#include "bar.h"
 #include "abstract_strategy.h"
-#include "indicator/abstract_indicator.h"
+#include "../bar.h"
+#include "../indicator/abstract_indicator.h"
 
 AbstractStrategy::AbstractStrategy(const QString &id, const QString& instrumentID, const QString& time_frame, QObject *parent) :
     QObject(parent),

@@ -1,9 +1,9 @@
 #include <QMetaEnum>
 #include <QDebug>
 
-#include "bar.h"
-#include "quant_trader.h"
 #include "DblMaPsar_strategy.h"
+#include "../bar.h"
+#include "../quant_trader.h"
 
 extern int MA_METHOD_enumIdx;
 extern int APPLIED_PRICE_enumIdx;

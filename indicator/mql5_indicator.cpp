@@ -1,5 +1,5 @@
 #include "mql5_indicator.h"
-#include "bar.h"
+#include "../bar.h"
 
 static double price_open(double open, double high, double low, double close)
 {
