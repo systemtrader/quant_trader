@@ -38,7 +38,7 @@ protected:
 signals:
     void collectedBar(const QString& instrumentID, int time_frame, const Bar& bar);
 public slots:
-    void onNewTick(int volume, double turnover, double openInterest, uint time, double lastPrice);
+    void onMarketData(uint time, double lastPrice, int volume);
     void saveBars();
 };
 

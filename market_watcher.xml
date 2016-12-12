@@ -1,13 +1,13 @@
 <!DOCTYPE node PUBLIC "-//freedesktop//DTD D-BUS Object Introspection 1.0//EN" "http://www.freedesktop.org/standards/dbus/1.0/introspect.dtd">
 <node>
   <interface name="org.ctp.market_watcher">
-    <signal name="newTick">
+    <signal name="newMarketData">
+      <arg name="instrumentID" type="s" direction="out"/>
+      <arg name="time" type="u" direction="out"/>
+      <arg name="lastPrice" type="d" direction="out"/>
       <arg name="volume" type="i" direction="out"/>
       <arg name="turnover" type="d" direction="out"/>
       <arg name="openInterest" type="d" direction="out"/>
-      <arg name="time" type="u" direction="out"/>
-      <arg name="lastPrice" type="d" direction="out"/>
-      <arg name="instrumentID" type="s" direction="out"/>
     </signal>
     <method name="getSubscribeList">
       <arg type="as" direction="out"/>

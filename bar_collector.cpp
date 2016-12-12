@@ -67,7 +67,7 @@ static const auto g_time_table = []() -> QMap<BarCollector::TimeFrame, uint> {
     return timeTable;
 }();
 
-void BarCollector::onNewTick(int volume, double turnover, double openInterest, uint time, double lastPrice)
+void BarCollector::onMarketData(uint time, double lastPrice, int volume)
 {
     foreach (const auto key, keys) {
         Bar & bar = current_bar_map[key];

@@ -45,7 +45,7 @@ public:
 signals:
 
 private slots:
-    void onNewTick(int volume, double turnover, double openInterest, uint time, double lastPrice, const QString &instrumentID);
+    void onMarketData(const QString& instrumentID, uint time, double lastPrice, int volume);
     void onNewBar(const QString &instrumentID, int time_frame, const Bar& bar);
 };
 

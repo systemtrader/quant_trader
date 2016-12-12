@@ -49,7 +49,7 @@ inline void AbstractStrategy::saveResult()
     result->setValue("sl_price", sl_price);
 }
 
-void AbstractStrategy::onNewTick(int volume, double turnover, double openInterest, uint time, double lastPrice)
+void AbstractStrategy::onNewTick(uint time, double lastPrice, int volume)
 {
     foreach (AbstractIndicator* indicator, indicators) {
         indicator->update();

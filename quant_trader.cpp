@@ -38,7 +38,7 @@ QuantTrader::QuantTrader(QObject *parent) :
 
     pExecuter = new org::ctp::ctp_executer("org.ctp.ctp_executer", "/ctp_executer", QDBusConnection::sessionBus(), this);
     pWatcher = new org::ctp::market_watcher("org.ctp.market_watcher", "/market_watcher", QDBusConnection::sessionBus(), this);
-    connect(pWatcher, SIGNAL(newTick(int,double,double,uint,double,QString)), this, SLOT(onNewTick(int,double,double,uint,double,QString)));
+    connect(pWatcher, SIGNAL(newMarketData(QString, uint, double, int, double, double)), this, SLOT(onMarketData(QString, uint, double, int)));
 }
 
 QuantTrader::~QuantTrader()
@@ -408,7 +408,6 @@ void QuantTrader::resetSaveBarTimer()
         return tlist;
     }();
 
-    qDebug() << time_points;
     const int size = time_points.size();
     int i;
     for (i = 0; i < size; i++) {
@@ -423,17 +422,17 @@ void QuantTrader::resetSaveBarTimer()
     }
 }
 
-void QuantTrader::onNewTick(int volume, double turnover, double openInterest, uint time, double lastPrice, const QString &instrumentID)
+void QuantTrader::onMarketData(const QString& instrumentID, uint time, double lastPrice, int volume)
 {
     BarCollector *collector = collector_map.value(instrumentID, nullptr);
     if (collector != nullptr) {
-        collector->onNewTick(volume, turnover, openInterest, time, lastPrice);
+        collector->onMarketData(time, lastPrice, volume);
     }
 
     QList<AbstractStrategy *> strategies = strategy_map.values(instrumentID);
     int new_position_sum = 0;
     foreach (AbstractStrategy *strategy, strategies) {
-        strategy->onNewTick(volume, turnover, openInterest, time, lastPrice);
+        strategy->onNewTick(time, lastPrice, volume);
         new_position_sum += strategy->getPosition();
     }
     if (position_map[instrumentID] != new_position_sum) {
