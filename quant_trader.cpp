@@ -412,13 +412,14 @@ void QuantTrader::resetSaveBarTimer()
     const int size = time_points.size();
     int i;
     for (i = 0; i < size; i++) {
-        int diff = time_points[i].msecsTo(QTime::currentTime());
+        int diff = QTime::currentTime().msecsTo(time_points[i]);
         if (diff > 1000) {
             saveBarTimer->start(diff);
+            break;
         }
     }
     if (i == size) {
-        int diff = time_points[0].msecsTo(QTime::currentTime());
+        int diff = QTime::currentTime().msecsTo(time_points[0]);
         saveBarTimer->start(diff + 86400000);   // diff should be negative, there are 86400 seconds in a day
     }
 }

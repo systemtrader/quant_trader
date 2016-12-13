@@ -105,6 +105,9 @@ void BarCollector::saveBars()
 {
     foreach (const auto key, keys) {
         auto & barList = bar_list_map[key];
+        if (barList.size() == 0) {
+            continue;
+        }
         QString time_frame_str = BarCollector::staticMetaObject.enumerator(barCollector_enumIdx).valueToKey(key);
         QString file_name = collector_dir + "/" + instrument + "/" + time_frame_str + "/" + QDateTime::currentDateTime().toString("yyyyMMdd_hhmmss_zzz") + ".bars";
         QFile barFile(file_name);
