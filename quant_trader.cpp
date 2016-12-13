@@ -31,6 +31,7 @@ QuantTrader::QuantTrader(QObject *parent) :
 
     saveBarTimer = new QTimer(this);
     saveBarTimer->setSingleShot(true);
+    connect(saveBarTimer, SIGNAL(timeout()), this, SLOT(resetSaveBarTimer()));
     foreach (auto & collector, collector_map) {
         connect(saveBarTimer, SIGNAL(timeout()), collector, SLOT(saveBars()));
     }
@@ -418,7 +419,7 @@ void QuantTrader::resetSaveBarTimer()
     }
     if (i == size) {
         int diff = time_points[0].msecsTo(QTime::currentTime());
-        saveBarTimer->start(diff);
+        saveBarTimer->start(diff + 86400000);   // diff should be negative, there are 86400 seconds in a day
     }
 }
 

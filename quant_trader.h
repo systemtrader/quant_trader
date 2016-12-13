@@ -33,7 +33,6 @@ protected:
     QList<Bar>* getBars(const QString &instrumentID, const QString &time_frame_str);
 
     QTimer *saveBarTimer;
-    void resetSaveBarTimer();
 
 public:
     explicit QuantTrader(QObject *parent = 0);
@@ -47,6 +46,7 @@ signals:
 private slots:
     void onMarketData(const QString& instrumentID, uint time, double lastPrice, int volume);
     void onNewBar(const QString &instrumentID, int time_frame, const Bar& bar);
+    void resetSaveBarTimer();
 };
 
 #endif // QUANT_TRADER_H
