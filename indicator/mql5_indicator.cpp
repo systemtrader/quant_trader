@@ -150,11 +150,16 @@ int MQL5IndicatorOnSingleDataBuffer::OnCalculate(const int rates_total,         
                                                  const _TimeSeries<double>& high,           // High
                                                  const _TimeSeries<double>& low,            // Low
                                                  const _TimeSeries<double>& close,          // Close
-                                                 const _TimeSeries<qint64>& tick_volume,      // Tick Volume
-                                                 const _TimeSeries<qint64>& volume,           // Real Volume
+                                                 const _TimeSeries<qint64>& tick_volume,    // Tick Volume
+                                                 const _TimeSeries<qint64>& volume,         // Real Volume
                                                  const _TimeSeries<int>& spread             // Spread
                                                  )
 {
+    Q_UNUSED(time)
+    Q_UNUSED(tick_volume)
+    Q_UNUSED(volume)
+    Q_UNUSED(spread)
+
     int limit;
     if (prev_calculated == 0) {
         limit = 0;

@@ -405,7 +405,7 @@ void QuantTrader::resetSaveBarTimer()
 {
     static const auto time_points = []() -> QList<QTime> {
         QList<QTime> tlist;
-        tlist << QTime(2, 32) << QTime(10, 17) << QTime(11, 32) << QTime(15, 2);
+        tlist << QTime(2, 32) << QTime(10, 17) << QTime(11, 32) << QTime(15, 17);
         return tlist;
     }();
 
