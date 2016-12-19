@@ -41,6 +41,7 @@ BarCollector::BarCollector(const QString& instrumentID, const TimeFrames &time_f
             }
         }
     }
+    lastVolume = 0;
 }
 
 BarCollector::~BarCollector()
@@ -67,19 +68,24 @@ static const auto g_time_table = []() -> QMap<BarCollector::TimeFrame, uint> {
     return timeTable;
 }();
 
-void BarCollector::onMarketData(uint time, double lastPrice, int volume)
+bool BarCollector::onMarketData(uint time, double lastPrice, int volume)
 {
+    bool isNewTick = (volume == lastVolume);
     foreach (const auto key, keys) {
         Bar & bar = current_bar_map[key];
         const uint time_unit = g_time_table[key];  // TODO optimize, use time_unit as key
 
-        if (bar.tick_volume > 0) {
-            if ((time / time_unit) != (bar.time / time_unit)) {
+        if ((time / time_unit) != (bar.time / time_unit)) {
+            if (bar.tick_volume > 0) {
                 bar_list_map[key].append(bar);
                 emit collectedBar(instrument, key, bar);
                 qDebug() << instrument << ": " << bar;
                 bar.init();
             }
+        }
+
+        if (isNewTick) {
+            continue;
         }
 
         if (bar.isNewBar()) {
@@ -98,7 +104,10 @@ void BarCollector::onMarketData(uint time, double lastPrice, int volume)
 
         bar.close = lastPrice;
         bar.tick_volume ++;
+        bar.volume += (volume - lastVolume);
     }
+    lastVolume = volume;
+    return isNewTick;
 }
 
 void BarCollector::saveBars()

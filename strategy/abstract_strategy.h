@@ -24,9 +24,12 @@ protected:
     double tp_price;
     double sl_price;
 
+    int lastCalcualtedBarTime;
     bool isNewBar() const;
     void resetPosition();
     void saveResult();
+    virtual void checkTPSL(double price);
+    virtual void onNewBar() = 0;
 
 public:
     explicit AbstractStrategy(const QString& id, const QString& instrumentID, const QString& time_frame, QObject *parent = 0);
@@ -46,9 +49,8 @@ public:
     virtual void setParameter(const QVariant& param1, const QVariant& param2, const QVariant& param3,
                               const QVariant& param4, const QVariant& param5, const QVariant& param6,
                               const QVariant& param7, const QVariant& param8, const QVariant& param9) = 0;
-    virtual void onNewTick(uint time, double lastPrice, int volume);
-    virtual void onNewBar() = 0;
-    virtual void checkTPSL(double price);
+    virtual void checkIfNewBar();
+    virtual void onNewTick(uint time, double lastPrice);
 
 signals:
 

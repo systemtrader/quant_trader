@@ -28,17 +28,18 @@ public:
 
     static QString collector_dir;
     Bar *getCurrentBar(const QString &time_frame_str);
+    bool onMarketData(uint time, double lastPrice, int volume);
 
 protected:
     const QString instrument;
     QList<TimeFrame> keys;
     QMap<TimeFrame, QList<Bar>> bar_list_map;
     QMap<TimeFrame, Bar> current_bar_map;
+    int lastVolume;
 
 signals:
     void collectedBar(const QString& instrumentID, int time_frame, const Bar& bar);
 public slots:
-    void onMarketData(uint time, double lastPrice, int volume);
     void saveBars();
 };
 

@@ -20,6 +20,8 @@ AbstractStrategy::AbstractStrategy(const QString &id, const QString& instrumentI
     position = result->value("position", 0).toInt();
     tp_price = result->value("tp_price", -1.0).toDouble();
     sl_price = result->value("sl_price", -1.0).toDouble();
+
+    lastCalcualtedBarTime = -1;
 }
 
 AbstractStrategy::~AbstractStrategy()
@@ -30,7 +32,7 @@ AbstractStrategy::~AbstractStrategy()
 
 inline bool AbstractStrategy::isNewBar() const
 {
-    return lastBar->tick_volume == 1;
+    return (lastBar->time != lastCalcualtedBarTime);
 }
 
 inline void AbstractStrategy::resetPosition()
@@ -47,19 +49,6 @@ inline void AbstractStrategy::saveResult()
     result->setValue("position", position);
     result->setValue("tp_price", tp_price);
     result->setValue("sl_price", sl_price);
-}
-
-void AbstractStrategy::onNewTick(uint time, double lastPrice, int volume)
-{
-    foreach (AbstractIndicator* indicator, indicators) {
-        indicator->update();
-    }
-
-    if (isNewBar()) {
-        onNewBar();
-        saveResult();
-    }
-    checkTPSL(lastPrice);
 }
 
 void AbstractStrategy::checkTPSL(double price)
@@ -81,4 +70,21 @@ void AbstractStrategy::checkTPSL(double price)
             resetPosition();
         }
     }
+}
+
+void AbstractStrategy::checkIfNewBar()
+{
+    if (isNewBar()) {
+        foreach (auto* indicator, indicators) {
+            indicator->update();
+        }
+        onNewBar();
+        saveResult();
+        lastCalcualtedBarTime = lastBar->time;
+    }
+}
+
+void AbstractStrategy::onNewTick(uint time, double lastPrice)
+{
+    checkTPSL(lastPrice);
 }

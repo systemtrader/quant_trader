@@ -427,14 +427,17 @@ void QuantTrader::resetSaveBarTimer()
 void QuantTrader::onMarketData(const QString& instrumentID, uint time, double lastPrice, int volume)
 {
     BarCollector *collector = collector_map.value(instrumentID, nullptr);
+    bool isNewTick = false;
     if (collector != nullptr) {
-        collector->onMarketData(time, lastPrice, volume);
+        isNewTick = collector->onMarketData(time, lastPrice, volume);
     }
 
-    QList<AbstractStrategy *> strategies = strategy_map.values(instrumentID);
+    auto strategyList = strategy_map.values(instrumentID);
     int new_position_sum = 0;
-    foreach (AbstractStrategy *strategy, strategies) {
-        strategy->onNewTick(time, lastPrice, volume);
+    foreach (auto *strategy, strategyList) {
+        if (isNewTick) {    // 有新的成交价格
+            strategy->onNewTick(time, lastPrice);
+        }
         new_position_sum += strategy->getPosition();
     }
     if (position_map[instrumentID] != new_position_sum) {
@@ -446,4 +449,8 @@ void QuantTrader::onMarketData(const QString& instrumentID, uint time, double la
 void QuantTrader::onNewBar(const QString &instrumentID, int time_frame, const Bar &bar)
 {
     bars_map[instrumentID][time_frame].append(bar);
+    auto strategyList = strategy_map.values(instrumentID);
+    foreach (auto *strategy, strategyList) {
+        strategy->checkIfNewBar();
+    }
 }
