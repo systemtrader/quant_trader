@@ -221,14 +221,14 @@ QList<Bar>* QuantTrader::getBars(const QString &instrumentID, const QString &tim
     const QString kt_export_file_name = kt_export_dir + "/" + time_frame_str + "/" + getKTExportName(instrumentID) + getSuffix(instrumentID);
     QFile kt_export_file(kt_export_file_name);
     kt_export_file.open(QFile::ReadOnly);
-    QDataStream stream(&kt_export_file);
-    stream.setFloatingPointPrecision(QDataStream::SinglePrecision);
-    stream.setByteOrder(QDataStream::LittleEndian);
+    QDataStream ktStream(&kt_export_file);
+    ktStream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+    ktStream.setByteOrder(QDataStream::LittleEndian);
 
     QList<Bar> *barList = &bars_map[instrumentID][time_frame_value];
     QList<KTExportBar> ktBarList;
-    stream.skipRawData(12);
-    stream >> ktBarList;
+    ktStream.skipRawData(12);
+    ktStream >> ktBarList;
     foreach (const KTExportBar &ktbar, ktBarList) {
         barList->append(ktbar);
     }
@@ -241,11 +241,16 @@ QList<Bar>* QuantTrader::getBars(const QString &instrumentID, const QString &tim
     collector_bar_dir.setNameFilters(filters);
     QStringList entries = collector_bar_dir.entryList(QDir::Files | QDir::NoDotAndDotDot, QDir::Name);
     foreach (const QString &barfilename, entries) {
-        QFile barfile(barfilename);
-        barfile.open(QFile::ReadOnly);
-        QDataStream stream(&kt_export_file);
-        stream.setFloatingPointPrecision(QDataStream::DoublePrecision);
-        stream >> *barList;
+        QFile barfile(collector_bar_path + "/" + barfilename);
+        if (!barfile.open(QFile::ReadOnly)) {
+            qDebug() << "Open file:" << (collector_bar_path + "/" + barfilename) << "failed!";
+            continue;
+        }
+        QDataStream barStream(&barfile);
+        barStream.setFloatingPointPrecision(QDataStream::DoublePrecision);
+        QList<Bar> tmpList;
+        barStream >> tmpList;
+        barList->append(tmpList);
     }
 
     if (collector_map.contains(instrumentID)) {
