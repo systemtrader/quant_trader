@@ -217,23 +217,26 @@ QList<Bar>* QuantTrader::getBars(const QString &instrumentID, const QString &tim
         }
     }
 
+    QList<Bar> *barList = &bars_map[instrumentID][time_frame_value];
+
     // Load KT Export Data
     const QString kt_export_file_name = kt_export_dir + "/" + time_frame_str + "/" + getKTExportName(instrumentID) + getSuffix(instrumentID);
     QFile kt_export_file(kt_export_file_name);
-    kt_export_file.open(QFile::ReadOnly);
-    QDataStream ktStream(&kt_export_file);
-    ktStream.setFloatingPointPrecision(QDataStream::SinglePrecision);
-    ktStream.setByteOrder(QDataStream::LittleEndian);
+    if (kt_export_file.open(QFile::ReadOnly)) {
+        QDataStream ktStream(&kt_export_file);
+        ktStream.setFloatingPointPrecision(QDataStream::SinglePrecision);
+        ktStream.setByteOrder(QDataStream::LittleEndian);
+        ktStream.skipRawData(12);
 
-    QList<Bar> *barList = &bars_map[instrumentID][time_frame_value];
-    QList<KTExportBar> ktBarList;
-    ktStream.skipRawData(12);
-    ktStream >> ktBarList;
-    foreach (const KTExportBar &ktbar, ktBarList) {
-        barList->append(ktbar);
+        QList<KTExportBar> ktBarList;
+        ktStream >> ktBarList;
+        foreach (const KTExportBar &ktbar, ktBarList) {
+            barList->append(ktbar);
+        }
+        kt_export_file.close();
     }
 
-    // load Collector Bars
+    // Load Collector Bars
     const QString collector_bar_path = BarCollector::collector_dir + "/" + instrumentID + "/" + time_frame_str;
     QDir collector_bar_dir(collector_bar_path);
     QStringList filters;
