@@ -32,7 +32,7 @@ QuantTrader::QuantTrader(QObject *parent) :
     saveBarTimer = new QTimer(this);
     saveBarTimer->setSingleShot(true);
     connect(saveBarTimer, SIGNAL(timeout()), this, SLOT(resetSaveBarTimer()));
-    foreach (auto & collector, collector_map) {
+    foreach (const auto & collector, collector_map) {
         connect(saveBarTimer, SIGNAL(timeout()), collector, SLOT(saveBars()));
     }
     resetSaveBarTimer();
@@ -87,7 +87,7 @@ void QuantTrader::loadTradeStrategySettings()
 
     QSettings settings(QSettings::IniFormat, QSettings::UserScope, "ctp", "trade_strategy");
     QStringList groups = settings.childGroups();
-    qDebug() << groups.size() << " stragegs in all.";
+    qDebug() << groups.size() << "stragegs in all.";
 
     foreach (const QString& group, groups) {
         settings.beginGroup(group);
@@ -110,13 +110,13 @@ void QuantTrader::loadTradeStrategySettings()
         const QMetaObject* strategy_meta_object = meta_object_map.value(strategy_name);
         QObject *object = strategy_meta_object->newInstance(Q_ARG(QString, group), Q_ARG(QString, instrument), Q_ARG(QString, time_frame), Q_ARG(QObject*, this));
         if (object == NULL) {
-            qDebug() << "Instantiating strategy " << group << " failed!";
+            qDebug() << "Instantiating strategy" << group << "failed!";
             continue;
         }
 
         auto *strategy = qobject_cast<AbstractStrategy*>(object);
         if (strategy == NULL) {
-            qDebug() << "Cast strategy " << group << " failed!";
+            qDebug() << "Cast strategy" << group << "failed!";
             delete object;
             continue;
         }
@@ -217,7 +217,8 @@ QList<Bar>* QuantTrader::getBars(const QString &instrumentID, const QString &tim
         }
     }
 
-    QList<Bar> *barList = &bars_map[instrumentID][time_frame_value];
+    // Insert a new Bar List item in bars_map
+    auto &barList = bars_map[instrumentID][time_frame_value];
 
     // Load KT Export Data
     const QString kt_export_file_name = kt_export_dir + "/" + time_frame_str + "/" + getKTExportName(instrumentID) + getSuffix(instrumentID);
@@ -230,8 +231,9 @@ QList<Bar>* QuantTrader::getBars(const QString &instrumentID, const QString &tim
 
         QList<KTExportBar> ktBarList;
         ktStream >> ktBarList;
+        qDebug() << ktBarList.size();
         foreach (const KTExportBar &ktbar, ktBarList) {
-            barList->append(ktbar);
+            barList.append(ktbar);
         }
         kt_export_file.close();
     }
@@ -253,16 +255,17 @@ QList<Bar>* QuantTrader::getBars(const QString &instrumentID, const QString &tim
         barStream.setFloatingPointPrecision(QDataStream::DoublePrecision);
         QList<Bar> tmpList;
         barStream >> tmpList;
-        barList->append(tmpList);
+        qDebug() << tmpList.size();
+        barList.append(tmpList);
     }
 
     if (collector_map.contains(instrumentID)) {
         connect(collector_map[instrumentID], SIGNAL(collectedBar(QString,int,Bar)), this, SLOT(onNewBar(QString,int,Bar)), Qt::DirectConnection);
     } else {
-        qDebug() << "Warning! Missing collector for " << instrumentID << " !";
+        qDebug() << "Warning! Missing collector for" << instrumentID << "!";
     }
 
-    return barList;
+    return &barList;
 }
 
 static QVariant getParam(const QByteArray &typeName, va_list &ap)
@@ -317,7 +320,7 @@ AbstractIndicator* QuantTrader::registerIndicator(const QString &instrumentID, c
 
     const QMetaObject * metaObject = meta_object_map.value(indicator_name, nullptr);
     if (metaObject == nullptr) {
-        qDebug() << "Indicator " << indicator_name << " not exist!";
+        qDebug() << "Indicator" << indicator_name << "not exist!";
         return nullptr;
     }
 
